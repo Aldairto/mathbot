@@ -1,71 +1,54 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
- 
+
 @layer base {
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
-
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
- 
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
- 
     --primary: 222.2 47.4% 11.2%;
     --primary-foreground: 210 40% 98%;
- 
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
- 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
- 
     --accent: 210 40% 96.1%;
     --accent-foreground: 222.2 47.4% 11.2%;
- 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
- 
     --radius: 0.5rem;
   }
- 
+
   .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
- 
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
- 
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
- 
     --primary: 210 40% 98%;
     --primary-foreground: 222.2 47.4% 11.2%;
- 
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
- 
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
- 
     --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
- 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
- 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
   }
 }
- 
+
 @layer base {
   * {
     @apply border-border;
@@ -75,3 +58,126 @@
   }
 }
 
+/* Estilos para fórmulas matemáticas */
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.5em 0;
+  margin: 0.5em 0;
+}
+
+.katex {
+  font-size: 1.1em;
+  line-height: 1.2;
+}
+
+.katex-html {
+  white-space: normal;
+}
+
+/* Ajustes para fracciones */
+.katex .mfrac {
+  margin: 0 0.2em;
+}
+
+.katex .mfrac .frac-line {
+  border-bottom-width: 0.04em;
+}
+
+/* Ajustes para fórmulas inline */
+.katex-inline {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  padding: 0 0.2em;
+}
+
+/* Ajuste para alineación vertical de fórmulas inline */
+.katex-inline .katex {
+  vertical-align: -0.5ex;
+}
+
+/* Estilos para mejorar la legibilidad en dispositivos móviles */
+@media (max-width: 640px) {
+  .katex-display,
+  .katex-inline {
+    font-size: 0.9em;
+  }
+}
+
+/* Ajustes para mejorar la legibilidad en las opciones del cuestionario */
+.quiz-option .katex {
+  margin: 0 0.2em;
+}
+
+/* Estilos para modo oscuro */
+.dark .katex {
+  color: hsl(var(--foreground));
+}
+
+.dark .katex-display {
+  background-color: hsl(var(--background));
+  border-radius: var(--radius);
+}
+
+/* Mejoras adicionales para la legibilidad del chat */
+.chat-message {
+  line-height: 1.6;
+}
+
+.chat-message p {
+  margin-bottom: 0.75em;
+}
+
+.chat-message pre {
+  background-color: hsl(var(--muted));
+  border-radius: var(--radius);
+  padding: 1em;
+  overflow-x: auto;
+  margin: 0.75em 0;
+}
+
+.chat-message code {
+  font-family: monospace;
+  background-color: hsl(var(--muted));
+  padding: 0.2em 0.4em;
+  border-radius: 0.2em;
+}
+
+/* Estilos para fórmulas matemáticas en mensajes del usuario */
+.user-math-inline .katex,
+.user-math-block .katex {
+  color: hsl(var(--primary)) !important;
+}
+
+/* Anula los estilos del modo oscuro para los mensajes del usuario */
+.dark .user-math-inline .katex,
+.dark .user-math-block .katex {
+  color: hsl(var(--primary)) !important;
+}
+
+/* Fondo para las fórmulas matemáticas en mensajes del usuario */
+.user-math-inline {
+  background-color: white;
+  padding: 0 4px;
+  border-radius: 4px;
+  margin: 0 2px;
+  
+}
+
+.user-math-block {
+  background-color: white;
+  padding: 8px;
+  border-radius: 4px;
+
+}
+.user-math-inline .katex,
+.user-math-block .katex {
+  color: black !important;
+}
+
+/* Asegurarse de que todos los elementos internos de KaTeX también sean negros */
+.user-math-inline .katex *,
+.user-math-block .katex * {
+  color: black !important;
+}

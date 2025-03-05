@@ -1,0 +1,125 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String    @id @default(cuid())
+  name              String?
+  email             String?   @unique
+  emailVerified     DateTime?
+  image             String?
+  password          String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  resetToken        String?
+  resetTokenExpires DateTime?
+  messages          Message[]
+  quizResults       QuizResult[]
+  adaptiveCurriculum AdaptiveCurriculum?
+  correctAnswers     CorrectAnswer[]
+  studyTimes        StudyTime[]
+  quizState         UserQuizState?
+  quizAttempts      QuizAttempt[]  // Añadida relación con QuizAttempt
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  content   String
+  role      String
+  createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model QuizResult {
+  id             String   @id @default(cuid())
+  userId         String
+  mainTopic      String
+  subTopic       String
+  correctCount   Int      @default(0)
+  incorrectCount Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  user           User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, mainTopic, subTopic])
+}
+
+model AdaptiveCurriculum {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id])
+  topics       Topic[]
+  lastUpdated  DateTime @default(now())
+}
+
+model Topic {
+  id                  String             @id @default(cuid())
+  mainTopic           String
+  subTopic            String
+  difficulty          Float              @default(0.5)
+  importance          Float              @default(0.5)
+  adaptiveCurriculum  AdaptiveCurriculum @relation(fields: [curriculumId], references: [id])
+  curriculumId        String
+
+  @@unique([curriculumId, mainTopic, subTopic])
+}
+
+model CorrectAnswer {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  question  String
+  answer    String
+  mainTopic String
+  subTopic  String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model StudyTime {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  date      DateTime @default(now())
+  duration  Int      // en segundos
+
+  @@index([userId])
+}
+
+model UserQuizState {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  state     String   // Eliminado 
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Nuevo modelo para registrar intentos individuales de preguntas
+model QuizAttempt {
+  id            String   @id @default(cuid())
+  userId        String
+  mainTopic     String
+  subTopic      String
+  question      String   // Eliminado 
+  userAnswer    String   // Eliminado 
+  correctAnswer String   // Eliminado 
+  isCorrect     Boolean
+  createdAt     DateTime @default(now())
+  
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([mainTopic, subTopic])
+}
+
