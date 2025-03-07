@@ -7,7 +7,7 @@ import Link from "next/link"
 
 export default function ResetPasswordPage() {
   const searchParams = useSearchParams()
-  const token = searchParams.get("token")
+  const token = searchParams?.get("token")
 
   if (!token) {
     return (
