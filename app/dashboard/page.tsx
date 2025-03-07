@@ -23,7 +23,7 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    if (status === "authenticated" && session?.user?.id) {
+      if (status === "authenticated" && session?.user && 'id' in session.user) {
       fetchQuizResults()
     } else if (status === "unauthenticated") {
       setIsLoading(false)
