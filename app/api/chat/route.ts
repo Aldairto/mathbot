@@ -41,7 +41,7 @@ export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions)
 
-    if (!session || !session.user || !session.user.id) {
+      if (!session || !(session as any).user || !(session as any).user.id) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 })
     }
 
