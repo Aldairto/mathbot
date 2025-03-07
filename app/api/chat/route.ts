@@ -46,7 +46,7 @@ export async function POST(req: Request) {
     }
 
     const { messages, generateQuiz, mainTopic, subTopic, includeCorrectAnswer } = await req.json()
-    const userId = session.user.id
+    const userId = session?.user?.id || 'anonymous'
 
     if (generateQuiz) {
       const quizContent = await generateQuestionnaire(mainTopic, subTopic, includeCorrectAnswer)
