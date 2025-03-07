@@ -9,7 +9,7 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   // Desactivar completamente la generación estática
-  output: 'standalone',
+  output: "standalone",
   experimental: {
     appDir: true,
   },
@@ -24,10 +24,11 @@ const nextConfig = {
         fs: false,
         net: false,
         tls: false,
-      };
+      }
     }
-    return config;
+    return config
   },
 }
 
 module.exports = nextConfig
+
