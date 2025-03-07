@@ -1,4 +1,3 @@
-// app/reset-password/reset-password-content.tsx
 "use client"
 
 import { useSearchParams } from "next/navigation"
