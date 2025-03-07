@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  unstable_runtimeJS: {
+    '/reset-password': true
+  },
   reactStrictMode: true,
   swcMinify: true,
   typescript: {
