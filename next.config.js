@@ -1,8 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  unstable_runtimeJS: {
-    '/reset-password': true
-  },
   reactStrictMode: true,
   swcMinify: true,
   typescript: {
@@ -11,16 +8,15 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  // Configuración para evitar la pre-renderización de páginas problemáticas
+  // Desactivar completamente la generación estática
   output: 'standalone',
   experimental: {
     appDir: true,
   },
-  // Excluir la página reset-password de la generación estática
-  exportPathMap: async function (defaultPathMap) {
-    delete defaultPathMap['/reset-password']
-    return defaultPathMap
-  },
+  // Configuración para forzar todas las páginas a ser dinámicas
+  staticPageGenerationTimeout: 0,
+  // Desactivar la exportación estática
+  trailingSlash: false,
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
