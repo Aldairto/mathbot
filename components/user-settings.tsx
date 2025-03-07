@@ -113,7 +113,7 @@ export function UserSettings() {
         <Label htmlFor="email">Correo electrónico:</Label>
         <Input
           id="email"
-          value={session.user.email}
+          value={session?.user?.email || ''}
           readOnly
             disabled
             className="bg-muted cursor-not-allowed"

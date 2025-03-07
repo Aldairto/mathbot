@@ -156,7 +156,6 @@ export function QuizInterface() {
           generateQuiz: true,
           mainTopic: selectedMainTopic,
           subTopic: selectedSubTopic,
-          includeCorrectAnswer: true, // Indicar que queremos la respuesta correcta explícitamente
         }),
       })
 
@@ -166,9 +165,7 @@ export function QuizInterface() {
         throw new Error(data.error || "Ocurrió un error desconocido")
       }
 
-      console.log("Contenido original del cuestionario:", data.content)
       const parsedQuiz = parseQuizContent(data.content)
-      console.log("Cuestionario parseado:", parsedQuiz)
       setQuiz(parsedQuiz)
       setRefreshKey((prevKey) => prevKey + 1)
     } catch (error) {
@@ -180,66 +177,16 @@ export function QuizInterface() {
   }
 
   const parseQuizContent = (content: string): Question[] => {
-    // Dividir el contenido en preguntas individuales
-    const questionBlocks = content.split(/\n\s*\d+\.\s+/).filter((block) => block.trim().length > 0)
-
-    return questionBlocks.map((block) => {
-      // Dividir el bloque en líneas y limpiar espacios en blanco
-      const lines = block
-        .split("\n")
-        .map((line) => line.trim())
-        .filter((line) => line.length > 0)
-
-      // La primera línea es la pregunta
+    const questions = content.split(/\n\d+\.\s/).filter((q) => q.trim() !== "")
+    return questions.map((q) => {
+      const lines = q.split("\n").filter((line) => line.trim() !== "")
       const questionText = lines[0].trim()
-
-      // Extraer las opciones y la respuesta correcta
-      const options: string[] = []
-      let correctAnswer = ""
-      const correctAnswerText = ""
-
-      // Recorrer las líneas buscando opciones y respuesta
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i].trim()
-
-        // Buscar opciones que comienzan con a), b), c), d)
-        const optionMatch = line.match(/^([a-d])\)(.*)/i)
-        if (optionMatch) {
-          const [, letter, text] = optionMatch
-          const index = letter.toLowerCase().charCodeAt(0) - 97 // Convertir a -> 0, b -> 1, etc.
-          options[index] = text.trim()
-        }
-
-        // Buscar la respuesta correcta
-        if (line.toLowerCase().includes("respuesta correcta")) {
-          // Extraer la letra de la respuesta correcta
-          const letterMatch = line.match(/respuesta correcta:\s*([a-d])/i)
-          if (letterMatch) {
-            correctAnswer = letterMatch[1].toLowerCase()
-            console.log(`Respuesta correcta identificada: ${correctAnswer}`)
-          }
-        }
-      }
-
-      // Verificar que tenemos todas las opciones
-      if (options.length !== 4) {
-        console.error("No se encontraron las 4 opciones para la pregunta:", questionText)
-        // Rellenar opciones faltantes si es necesario
-        while (options.length < 4) {
-          options.push(`Opción ${String.fromCharCode(97 + options.length)}`)
-        }
-      }
-
-      // Verificar que tenemos una respuesta correcta válida
-      if (!["a", "b", "c", "d"].includes(correctAnswer)) {
-        console.error("No se encontró una respuesta correcta válida para la pregunta:", questionText)
-        correctAnswer = "a" // Valor por defecto
-      }
-
+      const options = lines.slice(1, -1).map((o) => o.replace(/^[a-d]\)\s*/, "").trim())
+      const correctAnswer = lines[lines.length - 1].replace("Respuesta correcta: ", "").trim().toLowerCase()
       return {
         question: questionText,
-        options: options,
-        correctAnswer: correctAnswer,
+        options,
+        correctAnswer: correctAnswer.length === 1 ? correctAnswer : "a", // Fallback to 'a' if not a single letter
         userAnswer: "",
       }
     })
@@ -249,30 +196,11 @@ export function QuizInterface() {
     if (!quiz) return
 
     const updatedQuiz = quiz.map((q, index) => (index === questionIndex ? { ...q, userAnswer: answer } : q))
+
     setQuiz(updatedQuiz)
 
     const currentQuestion = updatedQuiz[questionIndex]
-    const isCorrect = currentQuestion.correctAnswer.toLowerCase() === answer.toLowerCase()
-
-    console.log(`Pregunta ${questionIndex + 1}:`)
-    console.log(`- Respuesta del usuario: ${answer}`)
-    console.log(`- Respuesta correcta: ${currentQuestion.correctAnswer}`)
-    console.log(`- ¿Es correcta?: ${isCorrect}`)
-    console.log(`- Opciones:`, currentQuestion.options)
-
-    // Obtener el texto de la opción seleccionada
-    const selectedOptionIndex = answer.charCodeAt(0) - 97
-    const selectedOptionText =
-      selectedOptionIndex >= 0 && selectedOptionIndex < currentQuestion.options.length
-        ? currentQuestion.options[selectedOptionIndex]
-        : "Opción no encontrada"
-
-    // Obtener el texto de la opción correcta
-    const correctOptionIndex = currentQuestion.correctAnswer.charCodeAt(0) - 97
-    const correctOptionText =
-      correctOptionIndex >= 0 && correctOptionIndex < currentQuestion.options.length
-        ? currentQuestion.options[correctOptionIndex]
-        : "Opción no encontrada"
+    const isCorrect = currentQuestion.correctAnswer === answer
 
     try {
       const response = await fetch("/api/quiz-results", {
@@ -284,9 +212,6 @@ export function QuizInterface() {
           mainTopic: selectedMainTopic,
           subTopic: selectedSubTopic,
           correct: isCorrect,
-          question: currentQuestion.question,
-          userAnswer: selectedOptionText,
-          correctAnswer: correctOptionText,
         }),
       })
 
@@ -335,82 +260,20 @@ export function QuizInterface() {
   const calculateScore = () => {
     if (!quiz) return 0
     return quiz.reduce((score, question) => {
-      return score + (question.correctAnswer.toLowerCase() === question.userAnswer?.toLowerCase() ? 1 : 0)
+      return score + (question.correctAnswer === question.userAnswer ? 1 : 0)
     }, 0)
   }
 
-  const renderMathExpression = (text: string, isCorrect = false, isIncorrect = false) => {
-    if (!text) return null
-  
-    // Solución simple: Agregar espacios alrededor de los delimitadores LaTeX
-    let processedText = text
-  
-    // Agregar espacios alrededor de los delimitadores $ si no los tienen
-    processedText = processedText.replace(/([^\s])\$/g, "$1 $")
-    processedText = processedText.replace(/\$([^\s])/g, "$ $1")
-  
-    // Agregar espacios alrededor de los delimitadores $$ si no los tienen
-    processedText = processedText.replace(/([^\s])\$\$/g, "$1 $$")
-    processedText = processedText.replace(/\$\$([^\s])/g, "$$ $1")
-  
-    // Dividir el texto en partes matemáticas y no matemáticas
-    const parts = processedText.split(/(\$\$.*?\$\$|\$.*?\$)/gs)
-  
-    // Determinar la clase de color basada en si es correcta o incorrecta
-    const colorClass = isCorrect ? "text-green-600" : isIncorrect ? "text-red-600" : ""
-  
-    // Procesar cada parte y asegurar espacios adecuados
-    const processedParts = parts.map(part => part.trim());
-    
-    return processedParts.map((part, index) => {
+  const renderMathExpression = (text: string) => {
+    const parts = text.split(/(\$\$.*?\$\$|\$.*?\$)/g)
+    return parts.map((part, index) => {
       if (part.startsWith("$$") && part.endsWith("$$")) {
-        try {
-          const math = part.slice(2, -2).trim()
-          return (
-            <span key={index} className={colorClass}>
-              {/* Agregar un espacio antes de la expresión matemática */}
-              {index > 0 && !processedParts[index - 1].endsWith("$") && " "}
-              <BlockMath math={math} />
-              {/* Agregar un espacio después de la expresión matemática */}
-              {index < processedParts.length - 1 && !processedParts[index + 1].startsWith("$") && " "}
-            </span>
-          )
-        } catch (error) {
-          console.error(`Error al renderizar BlockMath: ${error}`)
-          return (
-            <span key={index} className="text-red-500">
-              [Error en fórmula]
-            </span>
-          )
-        }
+        return <BlockMath key={index} math={part.slice(2, -2)} />
       } else if (part.startsWith("$") && part.endsWith("$")) {
-        try {
-          const math = part.slice(1, -1).trim()
-          return (
-            <span key={index} className={colorClass}>
-              {/* Agregar un espacio antes de la expresión matemática */}
-              {index > 0 && !processedParts[index - 1].endsWith("$") && " "}
-              <InlineMath math={math} />
-              {/* Agregar un espacio después de la expresión matemática */}
-              {index < processedParts.length - 1 && !processedParts[index + 1].startsWith("$") && " "}
-            </span>
-          )
-        } catch (error) {
-          console.error(`Error al renderizar InlineMath: ${error}`)
-          return (
-            <span key={index} className="text-red-500">
-              [Error en fórmula]
-            </span>
-          )
-        }
-      } else if (part.length > 0) {
-        return (
-          <span key={index} className={colorClass}>
-            {part}
-          </span>
-        )
+        return <InlineMath key={index} math={part.slice(1, -1)} />
+      } else {
+        return <span key={index}>{part}</span>
       }
-      return null
     })
   }
 
@@ -491,7 +354,6 @@ export function QuizInterface() {
                       const optionLetter = String.fromCharCode(97 + optionIndex)
                       const isCorrect = optionLetter === question.correctAnswer
                       const isSelected = question.userAnswer === optionLetter
-                      const isIncorrect = showResults && isSelected && !isCorrect
                       return (
                         <div
                           key={`${optionIndex}-${refreshKey}`}
@@ -500,26 +362,32 @@ export function QuizInterface() {
                           <RadioGroupItem value={optionLetter} id={`q${index}-option${optionIndex}`} className="mt-1" />
                           <Label
                             htmlFor={`q${index}-option${optionIndex}`}
-                            className={`flex-grow cursor-pointer ${isIncorrect ? "text-red-600 underline" : ""}`}
+                            className={`flex-grow cursor-pointer ${
+                              showResults
+                                ? isCorrect
+                                  ? "text-green-600 font-semibold"
+                                  : isSelected
+                                    ? "text-red-600 line-through"
+                                    : ""
+                                : ""
+                            }`}
                           >
-                            {optionLetter}) {renderMathExpression(option, showResults && isCorrect, isIncorrect)}
-                            {showResults && isCorrect && (
-                              <span className="ml-2 text-green-600 font-bold"> ✓ Correcto</span>
-                            )}
-                            {isIncorrect && <span className="ml-2 text-red-600 font-bold"> ✗ Incorrecto</span>}
+                            {optionLetter}) {renderMathExpression(option)}
+                            {showResults && isCorrect && <span className="text-green-600 ml-2">✓ Correcta</span>}
                           </Label>
                         </div>
                       )
                     })}
                   </RadioGroup>
                   {showResults && (
-                    <div className="mt-4">
-                      <span className="text-green-600">Respuesta correcta: {question.correctAnswer.toUpperCase()}</span>
-                      {question.userAnswer === question.correctAnswer ? (
-                        <span className="ml-4 text-green-600 font-bold">¡Has respondido correctamente!</span>
-                      ) : question.userAnswer ? (
-                        <span className="ml-4 text-red-600 font-bold">Respuesta incorrecta</span>
-                      ) : null}
+                    <div className="mt-4 text-green-600 font-semibold">
+                      La respuesta correcta es:{" "}
+                      {String.fromCharCode(
+                        97 +
+                          question.options.findIndex(
+                            (_, index) => String.fromCharCode(97 + index) === question.correctAnswer,
+                          ),
+                      ).toUpperCase()}
                     </div>
                   )}
                 </div>
