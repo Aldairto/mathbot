@@ -29,7 +29,8 @@ async function formatLatexResponse(content: string): Promise<string> {
   formatted = formatted.replace(/\n{3,}/g, "\n\n")
 
   // Asegurarse de que las fórmulas en bloque estén en líneas separadas
-  formatted = formatted.replace(/\$\$(.*?)\$\$/gs, (match) => `\n\n${match}\n\n`)
+
+  formatted = formatted.replace(/\$\$([\s\S]*?)\$\$/g, (match) => `\n\n${match}\n\n`)
 
   // Eliminar espacios en blanco adicionales al principio y al final
   formatted = formatted.trim()
