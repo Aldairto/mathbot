@@ -1,44 +1,24 @@
-"use client"
+// Este es un componente de servidor (sin "use client")
+import { Suspense } from "react"
+import { ResetPasswordClient } from "./reset-password-client"
 
-import { useSearchParams } from "next/navigation"
-import { ResetPasswordForm } from "@/components/reset-password-form"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import Link from "next/link"
+// Esto es crucial para evitar la generación estática de esta página
+export const dynamic = "force-dynamic"
+export const dynamicParams = true
+export const revalidate = 0
 
 export default function ResetPasswordPage() {
-  const searchParams = useSearchParams()
-  const token = searchParams.get("token")
-
-  if (!token) {
-    return (
-      <div className="container flex items-center justify-center min-h-screen py-8">
-        <Card className="w-full max-w-md">
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center">Error</CardTitle>
-            <CardDescription className="text-center">
-              No se proporcionó un token de restablecimiento válido.
-              <br />
-              <Link href="/forgot-password" className="text-primary hover:underline">
-                Volver a solicitar restablecimiento de contraseña
-              </Link>
-            </CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
-    )
-  }
-
   return (
     <div className="container flex items-center justify-center min-h-screen py-8">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Restablecer contraseña</CardTitle>
-          <CardDescription className="text-center">Ingresa tu nueva contraseña</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ResetPasswordForm token={token} />
-        </CardContent>
-      </Card>
+      <Suspense
+        fallback={
+          <div className="flex justify-center items-center p-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        }
+      >
+        <ResetPasswordClient />
+      </Suspense>
     </div>
   )
 }
