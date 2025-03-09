@@ -1,0 +1,13 @@
+{
+    "version": 2,
+    "buildCommand": "npm run build",
+    "installCommand": "npm install",
+    "framework": "nextjs",
+    "env": {
+      
+      "OPENAI_API_KEY":"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",
+      "NEXTAUTH_SECRET": "tu_secreto_aqui"
+    }
+  }
+  
+  

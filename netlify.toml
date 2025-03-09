@@ -1,0 +1,17 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+  
+[build.environment]
+  NEXT_TELEMETRY_DISABLED = "1"
+  # Agregar variables de entorno temporales para la construcción
+  OPENAI_API_KEY = "sk-dummy-key-for-build-only"
+  NEXTAUTH_SECRET = "temporary-secret-for-build-only"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[functions]
+  # Incluir archivos de Prisma en las funciones
+  included_files = ["node_modules/prisma/**/*", "prisma/**/*"]
+
