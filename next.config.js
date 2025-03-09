@@ -11,7 +11,7 @@ const nextConfig = {
   // Desactivar completamente la generación estática
   output: "standalone",
   experimental: {
-    appDir: true,
+    // Elimina la línea appDir: true
   },
   // Configuración para forzar todas las páginas a ser dinámicas
   staticPageGenerationTimeout: 0,
