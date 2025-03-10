@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: math-chatbot
+    env: node
+    buildCommand: chmod +x render-build.sh && ./render-build.sh
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: development
+      - key: NEXTAUTH_SECRET
+        value: un_secreto_temporal_muy_largo_y_seguro_para_pruebas
+      - key: OPENAI_API_KEY
+        value: sk-dummy-key-for-build-only
+      - key: PORT
+        value: 10000
+

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build || exit 0",
+    "build": "npx prisma generate && next build || exit 0",
     "start": "node server.js",
     "lint": "next lint"
   },
@@ -48,9 +48,10 @@
     "lucide-react": "^0.454.0",
     "next": "14.2.16",
     "next-themes": "^0.4.4",
-    "react": "^19",
+    "prisma": "^6.4.1",
+    "react": "^18.2.0",
     "react-day-picker": "8.10.1",
-    "react-dom": "^19",
+    "react-dom": "^18.2.0",
     "react-hook-form": "^7.54.1",
     "react-resizable-panels": "^2.1.7",
     "recharts": "2.15.0",
