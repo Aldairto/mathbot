@@ -10,7 +10,7 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  // Configuración para modo de despliegue
+  // Desactivar completamente la generación estática
   output: "standalone",
   // Configuración para forzar todas las páginas a ser dinámicas
   experimental: {
@@ -18,6 +18,8 @@ const nextConfig = {
     skipTrailingSlashRedirect: true,
     skipMiddlewareUrlNormalize: true,
   },
+  // Desactivar la generación estática para TODAS las páginas
+  staticPageGenerationTimeout: 0,
   // Configuración para manejar problemas con módulos del lado del servidor
   webpack: (config, { isServer }) => {
     if (!isServer) {
