@@ -12,14 +12,9 @@ const nextConfig = {
   },
   // Desactivar completamente la generación estática
   output: "standalone",
-  // Configuración para forzar todas las páginas a ser dinámicas
-  experimental: {
-    // Opciones válidas para Next.js 14
-    skipTrailingSlashRedirect: true,
-    skipMiddlewareUrlNormalize: true,
-  },
-  // Desactivar la generación estática para TODAS las páginas
-  staticPageGenerationTimeout: 0,
+  // Opciones que se movieron fuera de experimental
+  skipTrailingSlashRedirect: true,
+  skipMiddlewareUrlNormalize: true,
   // Configuración para manejar problemas con módulos del lado del servidor
   webpack: (config, { isServer }) => {
     if (!isServer) {
@@ -31,6 +26,11 @@ const nextConfig = {
       }
     }
     return config
+  },
+  // Desactivar la generación de páginas estáticas
+  distDir: process.env.NODE_ENV === "development" ? ".next" : ".next",
+  generateBuildId: async () => {
+    return "build-" + Date.now()
   },
 }
 

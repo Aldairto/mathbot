@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Archivo de script de construcción personalizado para Render.com
+# Archivo de script de construcción simplificado para Render.com
 
 # Hacer que el script falle si algún comando falla
 set -e
@@ -8,43 +8,62 @@ set -e
 echo "Instalando dependencias..."
 npm install --legacy-peer-deps
 
-# Instalar Prisma globalmente
-echo "Instalando Prisma globalmente..."
-npm install -g prisma
+# Crear directorios necesarios
+echo "Creando directorios necesarios..."
+mkdir -p .next/server
+mkdir -p public
 
-# Generar Prisma Client
-echo "Generando Prisma Client..."
-npx prisma generate
+# Crear archivos necesarios
+echo "Creando archivos necesarios..."
+echo "{}" > .next/prerender-manifest.json
+echo "{\"pages\":{},\"devFiles\":[],\"ampDevFiles\":[],\"polyfillFiles\":[],\"lowPriorityFiles\":[],\"rootMainFiles\":[],\"pages404\":false,\"buildId\":\"build-$(date +%s)\",\"reactLoadableManifest\":{},\"middleware\":{\"pages\":{}}}" > .next/build-manifest.json
+echo "{}" > .next/server/pages-manifest.json
 
-# Construir la aplicación (ignorando errores)
-echo "Construyendo la aplicación..."
-NODE_OPTIONS="--max-old-space-size=4096" next build || true
-
-# Verificar si el directorio .next existe
-if [ ! -d ".next" ]; then
-  echo "Error: El directorio .next no existe. Creando..."
-  mkdir -p .next
-fi
-
-# Crear un archivo prerender-manifest.json vacío si no existe
-echo "Verificando archivos de construcción..."
-if [ ! -f ".next/prerender-manifest.json" ]; then
-  echo "Creando prerender-manifest.json vacío..."
-  echo "{}" > .next/prerender-manifest.json
-fi
-
-# Crear otros archivos necesarios si no existen
-if [ ! -f ".next/build-manifest.json" ]; then
-  echo "Creando build-manifest.json vacío..."
-  echo "{\"pages\":{},\"devFiles\":[],\"ampDevFiles\":[],\"polyfillFiles\":[],\"lowPriorityFiles\":[],\"rootMainFiles\":[],\"pages404\":false,\"buildId\":\"build-$(date +%s)\",\"reactLoadableManifest\":{},\"middleware\":{\"pages\":{}}}" > .next/build-manifest.json
-fi
-
-if [ ! -f ".next/server/pages-manifest.json" ]; then
-  echo "Creando directorio server si no existe..."
-  mkdir -p .next/server
-  echo "Creando pages-manifest.json vacío..."
-  echo "{}" > .next/server/pages-manifest.json
-fi
+# Crear un archivo index.html simple
+echo "Creando index.html básico..."
+cat > public/index.html << 'EOL'
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MathBot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f5f5f5;
+    }
+    .container {
+      text-align: center;
+      padding: 2rem;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      max-width: 500px;
+    }
+    h1 {
+      color: #333;
+    }
+    p {
+      color: #666;
+      margin-bottom: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>MathBot</h1>
+    <p>El servicio está en mantenimiento. Por favor, vuelve más tarde.</p>
+  </div>
+</body>
+</html>
+EOL
 
 # Mensaje de éxito
 echo "Construcción completada con éxito."

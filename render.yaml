@@ -2,11 +2,11 @@ services:
   - type: web
     name: math-chatbot
     env: node
-    buildCommand: chmod +x render-build.sh && ./render-build.sh
+    buildCommand: npm install --legacy-peer-deps
     startCommand: npm run start
     envVars:
       - key: NODE_ENV
-        value: development
+        value: production
       - key: NEXTAUTH_SECRET
         value: un_secreto_temporal_muy_largo_y_seguro_para_pruebas
       - key: OPENAI_API_KEY

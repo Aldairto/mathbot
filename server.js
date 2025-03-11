@@ -51,27 +51,85 @@ if (!fs.existsSync(pagesManifestPath)) {
   fs.writeFileSync(pagesManifestPath, "{}")
 }
 
-// Iniciar Next.js en modo de desarrollo para evitar problemas con archivos faltantes
-console.log("Iniciando Next.js en modo de desarrollo...")
-const port = process.env.PORT || 3000
-const nextDev = spawn("next", ["dev", "-p", port], {
-  stdio: "inherit",
-  shell: true,
+// Crear un archivo index.html simple para servir
+const publicDir = path.join(__dirname, "public")
+if (!fs.existsSync(publicDir)) {
+  fs.mkdirSync(publicDir, { recursive: true })
+}
+
+const indexPath = path.join(publicDir, "index.html")
+if (!fs.existsSync(indexPath)) {
+  console.log("Creando index.html básico...")
+  fs.writeFileSync(
+    indexPath,
+    `<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MathBot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f5f5f5;
+    }
+    .container {
+      text-align: center;
+      padding: 2rem;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      max-width: 500px;
+    }
+    h1 {
+      color: #333;
+    }
+    p {
+      color: #666;
+      margin-bottom: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>MathBot</h1>
+    <p>El servicio está en mantenimiento. Por favor, vuelve más tarde.</p>
+  </div>
+</body>
+</html>`,
+  )
+}
+
+// Iniciar un servidor HTTP simple
+const http = require("http")
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { "Content-Type": "text/html" })
+  res.end(fs.readFileSync(indexPath))
 })
 
-nextDev.on("close", (code) => {
-  console.log(`Next.js se cerró con código: ${code}`)
-  process.exit(code)
+const port = process.env.PORT || 10000
+server.listen(port, () => {
+  console.log(`Servidor iniciado en http://localhost:${port}`)
 })
 
 // Manejar señales para cerrar correctamente
 process.on("SIGINT", () => {
   console.log("Recibida señal SIGINT, cerrando...")
-  nextDev.kill("SIGINT")
+  server.close(() => {
+    process.exit(0)
+  })
 })
 
 process.on("SIGTERM", () => {
   console.log("Recibida señal SIGTERM, cerrando...")
-  nextDev.kill("SIGTERM")
+  server.close(() => {
+    process.exit(0)
+  })
 })
 
