@@ -3,7 +3,7 @@ services:
     name: math-chatbot
     env: node
     plan: starter # Plan con más recursos
-    buildCommand: npm install --production --legacy-peer-deps
+    buildCommand: npm install && npm run build
     startCommand: npm run start
     envVars:
       - key: NODE_ENV
