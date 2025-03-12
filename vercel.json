@@ -6,6 +6,22 @@
   "env": {
     "NODE_ENV": "production",
     "NEXT_TELEMETRY_DISABLED": "1"
-  }
+  },
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/chat",
+      "dest": "/api/chat-fallback"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ]
 }
 

@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "postinstall": "prisma generate",
-    "vercel-build": "prisma generate && next build"
+    "vercel-build": "NODE_OPTIONS='--max_old_space_size=4096' NEXT_DISABLE_SOURCEMAPS=1 prisma generate && next build"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
@@ -84,6 +84,9 @@
     "@types/react-dom": "^18.2.17",
     "@types/react-katex": "^3.0.4",
     "typescript": "^5.3.3"
+  },
+  "optionalDependencies": {
+    "bcrypt": "^5.1.1"
   }
 }
 
