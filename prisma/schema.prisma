@@ -99,7 +99,7 @@ model StudyTime {
 model UserQuizState {
   id        String   @id @default(cuid())
   userId    String   @unique
-  state     String   // Eliminado 
+  state     String   // Eliminado @db.Text
   user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -111,9 +111,9 @@ model QuizAttempt {
   userId        String
   mainTopic     String
   subTopic      String
-  question      String   // Eliminado 
-  userAnswer    String   // Eliminado 
-  correctAnswer String   // Eliminado 
+  question      String   // Eliminado @db.Text
+  userAnswer    String   // Eliminado @db.Text
+  correctAnswer String   // Eliminado @db.Text
   isCorrect     Boolean
   createdAt     DateTime @default(now())
   
