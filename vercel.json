@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "npm install && prisma generate && npm run build",
+  "buildCommand": "npm run vercel-build",
   "installCommand": "npm install",
   "framework": "nextjs",
   "env": {

@@ -4,10 +4,12 @@ import prisma from "@/lib/prisma"
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/pages/api/auth/[...nextauth]"
 
+// Inicializar OpenAI con la clave API
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
+// Función para formatear respuestas LaTeX
 async function formatLatexResponse(content: string): Promise<string> {
   // Asegurarse de que las expresiones LaTeX tengan los delimitadores correctos
   let formatted = content
@@ -37,30 +39,36 @@ async function formatLatexResponse(content: string): Promise<string> {
   return formatted
 }
 
+// Manejador principal para solicitudes POST
 export async function POST(req: Request) {
   try {
+    // Verificar autenticación
     const session = await getServerSession(authOptions)
 
-      if (!session || !(session as any).user || !(session as any).user.id) {
+    if (!session || !(session as any).user || !(session as any).user.id) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 })
     }
 
+    // Analizar el cuerpo de la solicitud
     const { messages, generateQuiz, mainTopic, subTopic, includeCorrectAnswer } = await req.json()
-    const userId = (session as any)?.user?.id || 'anonymous'
+    const userId = (session as any)?.user?.id || "anonymous"
 
+    // Manejar generación de cuestionarios
     if (generateQuiz) {
       const quizContent = await generateQuestionnaire(mainTopic, subTopic, includeCorrectAnswer)
       console.log("Contenido del cuestionario generado:", quizContent)
       return NextResponse.json({ content: quizContent })
     }
 
+    // Validar mensajes
     if (!Array.isArray(messages)) {
       throw new Error("messages debe ser un array")
     }
 
-    // Solo enviar el último mensaje del usuario para evitar exceder el límite de tokens
+    // Obtener el último mensaje del usuario
     const lastUserMessage = messages[messages.length - 1].content
 
+    // Llamar a la API de OpenAI
     const response = await openai.chat.completions.create({
       model: "gpt-4",
       messages: [
@@ -92,15 +100,18 @@ export async function POST(req: Request) {
       ],
     })
 
+    // Verificar respuesta
     if (!response.choices || response.choices.length === 0) {
       throw new Error("No se recibió una respuesta válida de API")
     }
 
+    // Formatear respuesta
     const content = await formatLatexResponse(response.choices[0].message.content || "")
     console.log("Contenido formateado:", content)
 
-    // Guardar el mensaje del usuario y la respuesta del asistente en la base de datos
+    // Guardar mensajes en la base de datos
     try {
+      // Guardar mensaje del usuario
       const userMessage = await prisma.message.create({
         data: {
           content: messages[messages.length - 1].content,
@@ -111,6 +122,7 @@ export async function POST(req: Request) {
 
       console.log("Mensaje del usuario guardado:", userMessage)
 
+      // Guardar mensaje del asistente
       const assistantMessage = await prisma.message.create({
         data: {
           content,
@@ -132,44 +144,43 @@ export async function POST(req: Request) {
   }
 }
 
+// Función para generar cuestionarios
 async function generateQuestionnaire(
   mainTopic: string,
   subTopic: string,
   includeCorrectAnswer = false,
 ): Promise<string> {
   const prompt = `
-Genera un cuestionario de 5 preguntas sobre ${mainTopic} - ${subTopic}.
-Cada pregunta debe tener EXACTAMENTE 4 opciones de respuesta (a, b, c, d).
+  Genera un cuestionario de 5 preguntas sobre ${mainTopic} - ${subTopic}.
+  Cada pregunta debe tener EXACTAMENTE 4 opciones de respuesta (a, b, c, d).
 
-FORMATO EXACTO (respeta este formato):
-1. [Pregunta]
-a) [Opción a]
-b) [Opción b]
-c) [Opción c]
-d) [Opción d]
-Respuesta correcta: [letra]
+  FORMATO EXACTO (respeta este formato):
+  1. [Pregunta]
+  a) [Opción a]
+  b) [Opción b]
+  c) [Opción c]
+  d) [Opción d]
+  Respuesta correcta: [letra]
 
-2. [Pregunta]
-a) [Opción a]
-b) [Opción b]
-c) [Opción c]
-d) [Opción d]
-Respuesta correcta: [letra]
+  2. [Pregunta]
+  a) [Opción a]
+  b) [Opción b]
+  c) [Opción c]
+  d) [Opción d]
+  Respuesta correcta: [letra]
 
-Y así sucesivamente...
+  Y así sucesivamente...
 
-IMPORTANTE:
-- Cada pregunta DEBE tener exactamente 4 opciones, ni más ni menos.
-- La respuesta correcta DEBE ser SOLO la letra (a, b, c o d).
-- DISTRIBUYE ALEATORIAMENTE la respuesta correcta entre las cuatro opciones. NO coloques siempre la respuesta correcta en la opción "a".
-- Para cada pregunta, elige una letra diferente como respuesta correcta si es posible.
-- Asegúrate de que la letra de la respuesta correcta corresponda a una de las opciones.
-- NO incluyas explicaciones adicionales, solo el formato especificado.
-- Utiliza la sintaxis LaTeX con $ $ para las fórmulas matemáticas en línea y $$ $$ para las fórmulas en bloque.
-- Asegúrate de que las preguntas sean variadas y cubran diferentes aspectos del subtema dentro del contexto del tema principal.
-
-
-`
+  IMPORTANTE:
+  - Cada pregunta DEBE tener exactamente 4 opciones, ni más ni menos.
+  - La respuesta correcta DEBE ser SOLO la letra (a, b, c o d).
+  - DISTRIBUYE ALEATORIAMENTE la respuesta correcta entre las cuatro opciones. NO coloques siempre la respuesta correcta en la opción "a".
+  - Para cada pregunta, elige una letra diferente como respuesta correcta si es posible.
+  - Asegúrate de que la letra de la respuesta correcta corresponda a una de las opciones.
+  - NO incluyas explicaciones adicionales, solo el formato especificado.
+  - Utiliza la sintaxis LaTeX con $ $ para las fórmulas matemáticas en línea y $$ $$ para las fórmulas en bloque.
+  - Asegúrate de que las preguntas sean variadas y cubran diferentes aspectos del subtema dentro del contexto del tema principal.
+  `
 
   const response = await openai.chat.completions.create({
     model: "gpt-3.5-turbo", // Cambiado a gpt-3.5-turbo para reducir tokens
@@ -183,9 +194,8 @@ IMPORTANTE:
     ],
   })
 
-  let content = response.choices[0].message.content || "No se pudo generar el cuestionario."
-
-
+  const content = response.choices[0].message.content || "No se pudo generar el cuestionario."
 
   return content
 }
+
