@@ -1,16 +1,21 @@
-import NextAuth, { type AuthOptions } from "next-auth"
+import NextAuth from "next-auth"
+import GoogleProvider from "next-auth/providers/google"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
-import CredentialsProvider from "next-auth/providers/credentials"
 import prisma from "@/lib/prisma"
+import CredentialsProvider from "next-auth/providers/credentials"
 import bcrypt from "bcrypt"
 
-export const authOptions: AuthOptions = {
+export const authOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+    }),
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "text" },
+        email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
@@ -18,51 +23,53 @@ export const authOptions: AuthOptions = {
           return null
         }
 
-        const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email,
-          },
-        })
+        try {
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email },
+          })
 
-        if (!user || !user.password) {
-          console.log("Usuario no encontrado o sin contraseña")
+          if (!user || !user.password) {
+            return null
+          }
+
+          const isPasswordValid = await bcrypt.compare(credentials.password, user.password)
+
+          if (!isPasswordValid) {
+            return null
+          }
+
+          return {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            image: user.image,
+          }
+        } catch (error) {
+          console.error("Error en authorize:", error)
           return null
-        }
-
-        const isPasswordValid = await bcrypt.compare(credentials.password, user.password)
-
-        if (!isPasswordValid) {
-          console.log("Contraseña inválida")
-          return null
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
         }
       },
     }),
   ],
+  secret:
+    process.env.NEXTAUTH_SECRET ||
+    (process.env.NODE_ENV === "production"
+      ? "un_secreto_de_produccion_temporal_muy_largo_y_seguro"
+      : "secreto_de_desarrollo"),
   session: {
     strategy: "jwt",
   },
+  pages: {
+    signIn: "/login",
+    error: "/login",
+  },
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id
-      }
-      return token
-    },
     async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id as string
+      if (token && session.user) {
+        session.user.id = token.sub
       }
       return session
     },
-  },
-  pages: {
-    signIn: "/login",
   },
 }
 
