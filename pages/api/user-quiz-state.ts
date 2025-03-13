@@ -4,27 +4,48 @@ import { authOptions } from "./auth/[...nextauth]"
 import prisma from "@/lib/prisma"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const session = await getServerSession(req, res, authOptions)
-
-  if (!session || !session.user || !session.user.id) {
-    return res.status(401).json({ error: "No autorizado" })
-  }
-
-  const userId = session.user.id
-
   try {
+    const session = await getServerSession(req, res, authOptions)
+
+    if (!session || !session.user || !session.user.id) {
+      return res.status(401).json({ error: "No autorizado" })
+    }
+
+    const userId = session.user.id
+
     if (req.method === "GET") {
-      const quizState = await prisma.userQuizState.findUnique({
-        where: { userId },
-      })
-      res.status(200).json(quizState?.state ? JSON.parse(quizState.state) : null)
+      try {
+        const quizState = await prisma.userQuizState.findUnique({
+          where: { userId },
+        })
+
+        if (!quizState || !quizState.state) {
+          return res.status(200).json(null)
+        }
+
+        try {
+          const parsedState = JSON.parse(quizState.state)
+          return res.status(200).json(parsedState)
+        } catch (parseError) {
+          console.error("Error al analizar JSON del estado del cuestionario:", parseError)
+          return res.status(200).json(null) // Devolver null en lugar de fallar
+        }
+      } catch (error) {
+        console.error("Error al obtener el estado del cuestionario:", error)
+        return res.status(200).json(null) // Devolver null en lugar de fallar
+      }
     } else if (req.method === "POST") {
       const { state } = req.body
 
+      if (!state) {
+        return res.status(400).json({ error: "El estado es requerido" })
+      }
+
       // Convertir el estado a string y verificar su tamaño
       const stateString = JSON.stringify(state)
+      console.log(`Tamaño del estado del cuestionario: ${stateString.length} bytes`)
 
-      // Definir un límite seguro para MySQL TEXT (aproximadamente 16MB para LONGTEXT)
+      // Definir un límite seguro para MySQL LONGTEXT (aproximadamente 4GB, pero usamos un límite mucho menor)
       const SAFE_LIMIT = 10 * 1024 * 1024 // 10MB como límite seguro
 
       // Si el estado es demasiado grande, simplificarlo
@@ -82,11 +103,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       try {
-        const updatedQuizState = await prisma.userQuizState.upsert({
-          where: { userId },
-          update: { state: processedState },
-          create: { userId, state: processedState },
+        await prisma.$transaction(async (tx) => {
+          const existingState = await tx.userQuizState.findUnique({
+            where: { userId },
+          })
+
+          if (existingState) {
+            await tx.userQuizState.update({
+              where: { userId },
+              data: { state: processedState },
+            })
+          } else {
+            await tx.userQuizState.create({
+              data: { userId, state: processedState },
+            })
+          }
         })
+
         res.status(200).json({ success: true, message: "Estado guardado correctamente" })
       } catch (error) {
         console.error("Error al guardar el estado:", error)
@@ -97,16 +130,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         })
       }
     } else if (req.method === "DELETE") {
-      await prisma.userQuizState.delete({
-        where: { userId },
-      })
-      res.status(200).json({ message: "Estado del cuestionario eliminado" })
+      try {
+        await prisma.userQuizState
+          .delete({
+            where: { userId },
+          })
+          .catch((error) => {
+            // Si el registro no existe, simplemente ignorar el error
+            if (error.code !== "P2025") throw error
+          })
+
+        res.status(200).json({ message: "Estado del cuestionario eliminado" })
+      } catch (error) {
+        console.error("Error al eliminar el estado:", error)
+        res.status(500).json({ error: "Error al eliminar el estado" })
+      }
     } else {
       res.setHeader("Allow", ["GET", "POST", "DELETE"])
       res.status(405).end(`Method ${req.method} Not Allowed`)
     }
   } catch (error) {
-    console.error("Error en user-quiz-state:", error)
+    console.error("Error general en user-quiz-state:", error)
     res.status(500).json({ error: "Error interno del servidor" })
   }
 }

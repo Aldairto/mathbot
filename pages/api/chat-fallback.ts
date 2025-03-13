@@ -6,12 +6,13 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    // Respuesta simulada para permitir que la aplicación funcione sin bcrypt
-    return res.status(200).json({
-      content: "El servicio de chat está temporalmente en mantenimiento. Por favor, intenta más tarde.",
+    // Mensaje claro sobre la falta de API key
+    return res.status(503).json({
+      content:
+        "El servicio de chat no está disponible porque falta la clave de API de OpenAI. Por favor, configura OPENAI_API_KEY en las variables de entorno.",
     })
   } catch (error) {
-    console.error("Error en la ruta de chat:", error)
+    console.error("Error en la ruta de chat fallback:", error)
     return res.status(500).json({ error: "Error interno del servidor" })
   }
 }
