@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "postinstall": "prisma generate",
-    "vercel-build": "NODE_OPTIONS='--max_old_space_size=4096' NEXT_DISABLE_SOURCEMAPS=1 prisma generate && next build"
+    "vercel-build": "NODE_OPTIONS='--max_old_space_size=4096' NEXT_DISABLE_SOURCEMAPS=1 prisma generate && prisma db push --accept-data-loss && next build"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
