@@ -1,0 +1,74 @@
+[
+  {
+    "id": "cm7l1qpk90002hjw0uqk08m1k",
+    "name": "AldairToribio",
+    "email": "aldairto@gmail.com",
+    "emailVerified": null,
+    "image": null,
+    "password": "$2b$10$h9fGHGJ9th1eE02HEhsufOoPX7gzYHUoicUiIeRiiiXD/XNtKOWzy",
+    "createdAt": 1740521801962,
+    "updatedAt": 1741620946365,
+    "resetToken": null,
+    "resetTokenExpires": null
+  },
+  {
+    "id": "cm7mhgrkr005ehjawnx4w7oja",
+    "name": "Aldair",
+    "email": "aldairto@live.com.mx",
+    "emailVerified": null,
+    "image": null,
+    "password": "$2b$10$eueg2lFN1.4r0/jb9tPGMuogFrlAGosInVNNJxOOahpoSbg4EYuj6",
+    "createdAt": 1740608678043,
+    "updatedAt": 1740608678043,
+    "resetToken": null,
+    "resetTokenExpires": null
+  },
+  {
+    "id": "cm7pqiccp00c8hjrsokmwpbqg",
+    "name": "nancy",
+    "email": "nancys@gmail.com",
+    "emailVerified": null,
+    "image": null,
+    "password": "$2b$10$QWWfFc4ke9rRVpOUsb3JeOuJSiOYgwTa9Kz/NQ1ISnn23ZM4fOtiy",
+    "createdAt": 1740805266697,
+    "updatedAt": 1740806421786,
+    "resetToken": null,
+    "resetTokenExpires": null
+  },
+  {
+    "id": "cm7s62jez001whjfkfp6mit16",
+    "name": "Usuario1",
+    "email": "correo1@gmail.com",
+    "emailVerified": null,
+    "image": null,
+    "password": "$2b$10$0t0KN28n/f0FIVB0YggscunrZBrbJ.gNOZzQou07JsK78vKgJ0ZlO",
+    "createdAt": 1740952335563,
+    "updatedAt": 1740952335563,
+    "resetToken": null,
+    "resetTokenExpires": null
+  },
+  {
+    "id": "cm83867170004hjy0b6ffyrc4",
+    "name": "Usuario2",
+    "email": "mi@mail.com",
+    "emailVerified": null,
+    "image": null,
+    "password": "$2b$10$q2BtYJyIdIq8TkyAb.NA7.kaqOh.guTzeW3mZfRn47Rt9TLwNr3Me",
+    "createdAt": 1741620993308,
+    "updatedAt": 1741620993308,
+    "resetToken": null,
+    "resetTokenExpires": null
+  },
+  {
+    "id": "cm83dcpqf002thjy0hgbdyu7y",
+    "name": "Marco",
+    "email": "marco@correo.com",
+    "emailVerified": null,
+    "image": null,
+    "password": "$2b$10$4SPiqHQUwBPfLKKldrC5Hu5nmDMmmjsNp7.CC641/390gCT8/oZHK",
+    "createdAt": 1741629695559,
+    "updatedAt": 1741629762903,
+    "resetToken": null,
+    "resetTokenExpires": null
+  }
+]

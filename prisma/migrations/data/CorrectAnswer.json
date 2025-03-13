@@ -1,0 +1,1136 @@
+[
+  {
+    "id": "cm7pk5zvp0000hjw4xg7v3l5b",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "1. Si la razón entre dos números $x$ y $y$ es 4/7, ¿Cuál es la razón entre $2x$ y $y$?",
+    "answer": "8/7",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Razones",
+    "createdAt": 1740794612965
+  },
+  {
+    "id": "cm7pk7ql8000vhjw4q5o4hdqc",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "1. Dadas las coordenadas de dos puntos en el plano, $(2,3)$ y $(4,7)$, ¿cuál es la ecuación de la recta que pasa por estos puntos?",
+    "answer": "$3x - 2y + 4 = 0$",
+    "mainTopic": "1.4 Geometría analítica",
+    "subTopic": "Ecuación de la recta, de la circunferencia y de la parábola",
+    "createdAt": 1740794694236
+  },
+  {
+    "id": "cm7pkjjrq002uhjw4ayvdu64v",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "Cuál es el radio de la circunferencia definida por la ecuación $(x - 3)^2 + (y + 2)^2 = 16$?",
+    "answer": "$3$",
+    "mainTopic": "1.4 Geometría analítica",
+    "subTopic": "Ecuación de la recta, de la circunferencia y de la parábola",
+    "createdAt": 1740795245270
+  },
+  {
+    "id": "cm7pkjjrq002vhjw4fyolygp1",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "Si la ecuación de la recta en la forma punto-pendiente es $y - y_1 = m(x - x_1)$, cuál sería la ecuación de la recta que pasa por el punto $(-4, 2)$ con pendiente $m = -3$?",
+    "answer": "$y - 2 = -3(x + 4)$",
+    "mainTopic": "1.4 Geometría analítica",
+    "subTopic": "Ecuación de la recta, de la circunferencia y de la parábola",
+    "createdAt": 1740795245270
+  },
+  {
+    "id": "cm7pkjjrq002whjw41fyb305g",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "Cuál es el valor del foco de la parábola definida por la ecuación $(y - 2)^2 = -16(x - 1)$?",
+    "answer": "$(1, 2)$",
+    "mainTopic": "1.4 Geometría analítica",
+    "subTopic": "Ecuación de la recta, de la circunferencia y de la parábola",
+    "createdAt": 1740795245270
+  },
+  {
+    "id": "cm7pkjjrq002xhjw4c6igcbbq",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "Cuál de las siguientes ecuaciones representa una línea perpendicular a la línea $3y - x = 5$?",
+    "answer": "$y = -\\frac{1}{3}x + 2$",
+    "mainTopic": "1.4 Geometría analítica",
+    "subTopic": "Ecuación de la recta, de la circunferencia y de la parábola",
+    "createdAt": 1740795245270
+  },
+  {
+    "id": "cm7pld26u004khjw46o3dhbq9",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "Si la suma de la serie geométrica infinita es 5 y la razón es 1/2, ¿cuál es el primer término?",
+    "answer": "$2$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Series",
+    "createdAt": 1740796622166
+  },
+  {
+    "id": "cm7pqcqg5009yhjrswkukp62b",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "Bajo la suposición de independencia, ¿cuál es la probabilidad de $A$ y $B$ si $P(A) = 0.5$ y $P(B) = 0.4$?",
+    "answer": "$P(A\\cap B)=0.1$",
+    "mainTopic": "1.2 Probabilidad y estadística",
+    "subTopic": "Probabilidad",
+    "createdAt": 1740805005027
+  },
+  {
+    "id": "cm7pqcqg5009zhjrs41uwy6vm",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "¿Qué vale la probabilidad de un evento improbable?",
+    "answer": "$P(Evento)=0.5$",
+    "mainTopic": "1.2 Probabilidad y estadística",
+    "subTopic": "Probabilidad",
+    "createdAt": 1740805005027
+  },
+  {
+    "id": "cm7pqqd1q00cdhjrs1aaz4q9a",
+    "userId": "cm7pqiccp00c8hjrsokmwpbqg",
+    "question": "1. ¿Qué es la moda en una distribución de frecuencias?",
+    "answer": "$n-1$",
+    "mainTopic": "1.2 Probabilidad y estadística",
+    "subTopic": "Estadística descriptiva",
+    "createdAt": 1740805640847
+  },
+  {
+    "id": "cm7pqqd1q00cehjrsaor627nt",
+    "userId": "cm7pqiccp00c8hjrsokmwpbqg",
+    "question": "Si tenemos una muestra de datos $x_1, x_2, ..., x_n$, ¿cuál es la fórmula de la varianza muestral?",
+    "answer": "$s^2=\\frac{1}{n}\\sum_{i=1}^{n}(x_i-\\bar{x})^2$",
+    "mainTopic": "1.2 Probabilidad y estadística",
+    "subTopic": "Estadística descriptiva",
+    "createdAt": 1740805640847
+  },
+  {
+    "id": "cm7pqqd1r00cfhjrsdj0mevxz",
+    "userId": "cm7pqiccp00c8hjrsokmwpbqg",
+    "question": "Si se conocen los valores de la moda, la mediana y la media, ¿Cómo podría estar distribuida la muestra de datos?",
+    "answer": "Simétricamente",
+    "mainTopic": "1.2 Probabilidad y estadística",
+    "subTopic": "Estadística descriptiva",
+    "createdAt": 1740805640847
+  },
+  {
+    "id": "cm7pqqd1r00cghjrstq1ihfk9",
+    "userId": "cm7pqiccp00c8hjrsokmwpbqg",
+    "question": "Dadas las observaciones $X = \\{9, 2, 5, 4, 12, 7, 8, 11, 9, 3, 7, 4\\}$, ¿cuál es el rango (el mayor menos el menor)?",
+    "answer": "$12-7 = 5$",
+    "mainTopic": "1.2 Probabilidad y estadística",
+    "subTopic": "Estadística descriptiva",
+    "createdAt": 1740805640847
+  },
+  {
+    "id": "cm7pqqd1r00chhjrs4oinntpn",
+    "userId": "cm7pqiccp00c8hjrsokmwpbqg",
+    "question": "Si se tiene un histograma con una cola más larga en el lado derecho, ¿Cómo se describe la distribución?",
+    "answer": "Distribución con sesgo a la izquierda",
+    "mainTopic": "1.2 Probabilidad y estadística",
+    "subTopic": "Estadística descriptiva",
+    "createdAt": 1740805640847
+  },
+  {
+    "id": "cm7pqs0g100cihjrsr0jfctsg",
+    "userId": "cm7pqiccp00c8hjrsokmwpbqg",
+    "question": "Dada la ecuación de proporciones $ \\frac{3}{4} = \\frac{9}{x} $, ¿cuál es el valor correcto de $ x $?",
+    "answer": "$12$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Proporciones",
+    "createdAt": 1740805717826
+  },
+  {
+    "id": "cm7pqs0g100cjhjrsvj010x7r",
+    "userId": "cm7pqiccp00c8hjrsokmwpbqg",
+    "question": "Resuelve la proporción para $ n $: $ \\frac{24}{n} = \\frac{6}{4} $.",
+    "answer": "$16$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Proporciones",
+    "createdAt": 1740805717826
+  },
+  {
+    "id": "cm7s47yte00fwhjwgcpmesgen",
+    "userId": "cm7pqiccp00c8hjrsokmwpbqg",
+    "question": "Sean $a$ y $b$ números positivos. Si $\\frac{a}{b} = 3$ y $a + b = 20$, ¿cuál es el valor de $a$?",
+    "answer": "$5$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Proporciones",
+    "createdAt": 1740949229570
+  },
+  {
+    "id": "cm7s47yte00fxhjwg89726iwi",
+    "userId": "cm7pqiccp00c8hjrsokmwpbqg",
+    "question": "Si $\\frac{5}{x} = \\frac{20}{8}$, ¿cuál es el valor de $x$?",
+    "answer": "$1.6$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Proporciones",
+    "createdAt": 1740949229570
+  },
+  {
+    "id": "cm7s47yte00fyhjwgwogf9rb3",
+    "userId": "cm7pqiccp00c8hjrsokmwpbqg",
+    "question": "En una proporción, el numerador del primer término es 5, y el denominador del segundo término es 25. Si los términos no tienen un valor común, ¿cuál es el numerador del segundo término si el denominador del primer término es 7?",
+    "answer": "$35$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Proporciones",
+    "createdAt": 1740949229570
+  },
+  {
+    "id": "cm7s47yte00fzhjwgqjesopch",
+    "userId": "cm7pqiccp00c8hjrsokmwpbqg",
+    "question": "Dados los números $x$, $y$, $z$, y $w$, si la proporción $\\frac{x}{y} = \\frac{z}{w}$ es verdadera, y $x = 6$, $y = 3$, $w = 6$, ¿cuál es el valor de $z$?",
+    "answer": "$3$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Proporciones",
+    "createdAt": 1740949229570
+  },
+  {
+    "id": "cm7s48t2200gahjwgtay953bj",
+    "userId": "cm7pqiccp00c8hjrsokmwpbqg",
+    "question": "Dada la sucesión aritmética $a_n = 2n - 5$, ¿cuál es el valor del $10$th término?",
+    "answer": "$15$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Sucesiones",
+    "createdAt": 1740949268763
+  },
+  {
+    "id": "cm7s48t2200gbhjwg7k4bbdgh",
+    "userId": "cm7pqiccp00c8hjrsokmwpbqg",
+    "question": "Dados los primeros tres términos de una sucesión geométrica $2$, $6$, y $18$, ¿cuál es el valor del $5$th término?",
+    "answer": "$162$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Sucesiones",
+    "createdAt": 1740949268763
+  },
+  {
+    "id": "cm7s4ixm5001ihjfkuserbmfm",
+    "userId": "cm7pqiccp00c8hjrsokmwpbqg",
+    "question": "1. Si la sucesión $(a_n)$ es dada por $a_n = 3n+2$, ¿cuál es $a_5$?",
+    "answer": "- $17$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Sucesiones",
+    "createdAt": 1740949741229
+  },
+  {
+    "id": "cm7s4ixm5001jhjfk0cwt93uh",
+    "userId": "cm7pqiccp00c8hjrsokmwpbqg",
+    "question": "¿Es $2, 6, 18, 54, ...$ una sucesión geométrica? Si es así, ¿cuál es la razón?",
+    "answer": "- Sí, la razón es $3$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Sucesiones",
+    "createdAt": 1740949741229
+  },
+  {
+    "id": "cm7s64dmr002rhjfk1lgdi9hf",
+    "userId": "cm7s62jez001whjfkfp6mit16",
+    "question": "¿Cuál es la definición de la Probabilidad Clásica?",
+    "answer": "\\[\"El cálculo de la probabilidad basado en la presunción de que los eventos son igualmente posibles\"\\]",
+    "mainTopic": "1.2 Probabilidad y estadística",
+    "subTopic": "Probabilidad",
+    "createdAt": 1740952421380
+  },
+  {
+    "id": "cm7s64dmr002shjfkt6ryu3i3",
+    "userId": "cm7s62jez001whjfkfp6mit16",
+    "question": "Si una bolsa contiene 3 manzanas verdes y 2 manzanas rojas, ¿cuál es la probabilidad de que una manzana tomada aleatoriamente sea verde?",
+    "answer": "\\[\\frac{3}{5}\\]",
+    "mainTopic": "1.2 Probabilidad y estadística",
+    "subTopic": "Probabilidad",
+    "createdAt": 1740952421380
+  },
+  {
+    "id": "cm7s65f95003thjfkatq213je",
+    "userId": "cm7s62jez001whjfkfp6mit16",
+    "question": "¿Cuál es la ecuación de la parábola con vértice en $(h, k)$ y foco en $(h, k + p)$?",
+    "answer": "$x = \\frac{1}{4p}(y - k)^2 + h$",
+    "mainTopic": "1.4 Geometría analítica",
+    "subTopic": "Ecuación de la recta, de la circunferencia y de la parábola",
+    "createdAt": 1740952470137
+  },
+  {
+    "id": "cm7s6h7x2004shjfkq4sp58zc",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "Dada la serie de frecuencias $f(n) = 4n - 3$, ¿cuál sería el término séptimo de la serie?",
+    "answer": "$21$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Series",
+    "createdAt": 1740953020503
+  },
+  {
+    "id": "cm7s6h7x2004thjfk611l7njy",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "En la siguiente serie $\\{{2n\\}^2 - 1\\}$, ¿cuál es el valor del término noveno?",
+    "answer": "$156$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Series",
+    "createdAt": 1740953020503
+  },
+  {
+    "id": "cm7s9m7jq001mhj0csy3j73j8",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "1. ¿Cuál es la probabilidad de obtener un número par en un solo lanzamiento de un dado regular de seis lados?",
+    "answer": "$P(E) = \\frac{n(E)}{n(S)}$",
+    "mainTopic": "1.2 Probabilidad y estadística",
+    "subTopic": "Probabilidad",
+    "createdAt": 1740958292150
+  },
+  {
+    "id": "cm7s9m7jq001nhj0cmjyjyhof",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "¿Cuál es el complemento de una probabilidad $P(A)$?",
+    "answer": "$P(A') = 1 - P(A)$",
+    "mainTopic": "1.2 Probabilidad y estadística",
+    "subTopic": "Probabilidad",
+    "createdAt": 1740958292150
+  },
+  {
+    "id": "cm7s9m7jq001ohj0c5eipfgqt",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "En una bolsa hay 3 bolas rojas, 2 bolas azules y 4 bolas verdes. ¿Cuál es la probabilidad de que al sacar una bola al azar esta sea azul?",
+    "answer": "$P(Azul) = \\frac{n(Azul)}{n(S)}$",
+    "mainTopic": "1.2 Probabilidad y estadística",
+    "subTopic": "Probabilidad",
+    "createdAt": 1740958292150
+  },
+  {
+    "id": "cm7s9m7jq001phj0cvltysk1d",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "En un mazo de 52 cartas, ¿Cuál es la probabilidad de sacar un rey o una reina?",
+    "answer": "$P(Rey\\ o\\ Reina) = P(Rey) + P(Reina)$",
+    "mainTopic": "1.2 Probabilidad y estadística",
+    "subTopic": "Probabilidad",
+    "createdAt": 1740958292150
+  },
+  {
+    "id": "cm7s9m7jq001qhj0c7845q01p",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "¿Cuál es la probabilidad de obtener un 6 en la tirada de dos dados?",
+    "answer": "$P(6) = P(1,5)+P(2,4)+P(3,3)+P(4,2)+P(5,1)$",
+    "mainTopic": "1.2 Probabilidad y estadística",
+    "subTopic": "Probabilidad",
+    "createdAt": 1740958292150
+  },
+  {
+    "id": "cm7s9nqll002lhj0clclpcl1r",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "1. ¿Qué variable es más útil para calcular la media en un conjunto de datos?",
+    "answer": "$x$ (dato individual)",
+    "mainTopic": "1.2 Probabilidad y estadística",
+    "subTopic": "Estadística descriptiva",
+    "createdAt": 1740958363497
+  },
+  {
+    "id": "cm7s9nqll002mhj0cgb6fr8eo",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "¿Cuál es la fórmula para la varianza en un conjunto de datos?",
+    "answer": "$$s^2 = \\frac{\\sum_{i=1}^{n}(x_i - \\overline{x})^2}{n - 1}$$",
+    "mainTopic": "1.2 Probabilidad y estadística",
+    "subTopic": "Estadística descriptiva",
+    "createdAt": 1740958363497
+  },
+  {
+    "id": "cm7s9nqll002nhj0cpd05e9t8",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "En un conjunto de datos, ¿cómo se calcula la moda?",
+    "answer": "El valor que aparece con mayor frecuencia",
+    "mainTopic": "1.2 Probabilidad y estadística",
+    "subTopic": "Estadística descriptiva",
+    "createdAt": 1740958363497
+  },
+  {
+    "id": "cm7s9nqll002ohj0c6p3ah4oy",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "Si el tercer cuartil de un conjunto de datos es 75, ¿qué significa esto?",
+    "answer": "El 25% de los datos son menores o iguales a 75",
+    "mainTopic": "1.2 Probabilidad y estadística",
+    "subTopic": "Estadística descriptiva",
+    "createdAt": 1740958363497
+  },
+  {
+    "id": "cm7s9nqll002phj0c48vgilk9",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "¿Cuál es la interpretación del coeficiente de correlación $r$ si $r = 0$?",
+    "answer": "Existe una correlación perfecta positiva entre las dos variables",
+    "mainTopic": "1.2 Probabilidad y estadística",
+    "subTopic": "Estadística descriptiva",
+    "createdAt": 1740958363497
+  },
+  {
+    "id": "cm7s9sd1v001ghjzctk8p5bpo",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "1. ¿Cuál de las siguientes ecuaciones representa una función lineal?",
+    "answer": "$y = x^2 + 2x + 1$",
+    "mainTopic": "1.5 Funciones",
+    "subTopic": "Función lineal",
+    "createdAt": 1740958579220
+  },
+  {
+    "id": "cm7s9sd1v001hhjzc9x8f7wop",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "¿Cuál es la pendiente de la función lineal representada por la ecuación $y = 4x - 7$?",
+    "answer": "$4$",
+    "mainTopic": "1.5 Funciones",
+    "subTopic": "Función lineal",
+    "createdAt": 1740958579220
+  },
+  {
+    "id": "cm7s9sd1v001ihjzcg0tebqui",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "¿Cuál es el valor de y en el punto de intercepción con el eje y de la función lineal $y = -3x + 5$?",
+    "answer": "$3$",
+    "mainTopic": "1.5 Funciones",
+    "subTopic": "Función lineal",
+    "createdAt": 1740958579220
+  },
+  {
+    "id": "cm7s9sd1v001jhjzcprfiuw6i",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "¿Cuál es el valor de $y$ al evaluar $x=2$ en la función lineal $y = -x + 3$?",
+    "answer": "$1$",
+    "mainTopic": "1.5 Funciones",
+    "subTopic": "Función lineal",
+    "createdAt": 1740958579220
+  },
+  {
+    "id": "cm7s9sd1v001khjzcey7ybeyq",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "¿Cuál es la pendiente de la función lineal representada por la ecuación $3x - y + 2 = 0$?",
+    "answer": "$3$",
+    "mainTopic": "1.5 Funciones",
+    "subTopic": "Función lineal",
+    "createdAt": 1740958579220
+  },
+  {
+    "id": "cm7saubry000ahj2c44rqbpzv",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "Si tenemos una línea que pasa por los puntos $A(-3, 2)$ y $B(4, -1)$, ¿cuál es su pendiente?",
+    "answer": "$-0.43$",
+    "mainTopic": "1.4 Geometría analítica",
+    "subTopic": "Pendiente y ángulo de inclinación",
+    "createdAt": 1740960350494
+  },
+  {
+    "id": "cm7saubry000bhj2ccyr497b9",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "¿Cómo se relaciona la pendiente de una línea con su ángulo de inclinación?",
+    "answer": "La pendiente es el coseno del ángulo de inclinación",
+    "mainTopic": "1.4 Geometría analítica",
+    "subTopic": "Pendiente y ángulo de inclinación",
+    "createdAt": 1740960350494
+  },
+  {
+    "id": "cm7saubry000chj2ctsssaix6",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "¿Cómo calculamos el ángulo de inclinación, $\\theta$, a partir de la pendiente, $m$, teniendo en cuenta que $m = \\tan(\\theta)$?",
+    "answer": "$\\theta = \\arctan(m)$",
+    "mainTopic": "1.4 Geometría analítica",
+    "subTopic": "Pendiente y ángulo de inclinación",
+    "createdAt": 1740960350494
+  },
+  {
+    "id": "cm7saubry000dhj2coys22edp",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "Si una línea pasa por los puntos $P(1, 2)$ y $Q(3, 6)$, ¿cuál es el ángulo de inclinación de la línea en grados? (Redondee a dos decimales si es necesario).",
+    "answer": "$45.0^\\circ$",
+    "mainTopic": "1.4 Geometría analítica",
+    "subTopic": "Pendiente y ángulo de inclinación",
+    "createdAt": 1740960350494
+  },
+  {
+    "id": "cm7sawl7f001uhj2cq6un3vyt",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "1. Si un evento tiene una probabilidad de 0.2 de ocurrir, ¿cuál es la probabilidad de que NO ocurra?",
+    "answer": "- 0.2",
+    "mainTopic": "1.2 Probabilidad y estadística",
+    "subTopic": "Probabilidad",
+    "createdAt": 1740960456027
+  },
+  {
+    "id": "cm7sawl7f001vhj2c6d3hf62v",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "¿Qué se entiende por espacio de muestras en probabilidad?",
+    "answer": "- El número total de veces que se realiza un experimento",
+    "mainTopic": "1.2 Probabilidad y estadística",
+    "subTopic": "Probabilidad",
+    "createdAt": 1740960456027
+  },
+  {
+    "id": "cm7sawl7f001whj2cjl3hozfx",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "Si lanzamos una moneda dos veces, ¿cuál es la probabilidad de obtener dos caras seguidas? Expresa tu respuesta como una fracción.",
+    "answer": "- $\\frac{1}{2}$",
+    "mainTopic": "1.2 Probabilidad y estadística",
+    "subTopic": "Probabilidad",
+    "createdAt": 1740960456027
+  },
+  {
+    "id": "cm7sawl7f001xhj2cn99mrin5",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "En una clase de 30 estudiantes, 15 son mujeres y 15 son hombres. ¿Cuál es la probabilidad de seleccionar al azar a un estudiante y que sea mujer?",
+    "answer": "- $\\frac{1}{2}$",
+    "mainTopic": "1.2 Probabilidad y estadística",
+    "subTopic": "Probabilidad",
+    "createdAt": 1740960456027
+  },
+  {
+    "id": "cm7sawl7f001yhj2csaedq31v",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "Si se tira un dado justo, ¿cuál es la probabilidad de obtener un número par?",
+    "answer": "- $\\frac{1}{2}$",
+    "mainTopic": "1.2 Probabilidad y estadística",
+    "subTopic": "Probabilidad",
+    "createdAt": 1740960456027
+  },
+  {
+    "id": "cm7sbda0t0038hj50aq0659pd",
+    "userId": "cm7mhgrkr005ehjawnx4w7oja",
+    "question": "En una bolsa hay 4 manzanas rojas, 3 manzanas verdes y 2 manzanas amarillas. Si selecciono una manzana al azar, ¿cuál es la probabilidad de que sea roja?",
+    "answer": "- $ \\frac{4}{9} $",
+    "mainTopic": "1.2 Probabilidad y estadística",
+    "subTopic": "Probabilidad",
+    "createdAt": 1740961234667
+  },
+  {
+    "id": "cm7sbda0t0039hj50u9jcwbnw",
+    "userId": "cm7mhgrkr005ehjawnx4w7oja",
+    "question": "Si P(A)=0.5, P(B)=0.6 y A y B son eventos independientes. Entonces la probabilidad P(A $\\cap$ B) es:",
+    "answer": "- 0.3",
+    "mainTopic": "1.2 Probabilidad y estadística",
+    "subTopic": "Probabilidad",
+    "createdAt": 1740961234667
+  },
+  {
+    "id": "cm7sbml1n001ahjmsg2a9ob16",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "Dados dos lados de un triángulo rectángulo como $a = 3$ y $b = 4$, ¿cuánto mide la hipotenusa $c$?",
+    "answer": "$$",
+    "mainTopic": "1.3 Geometría y trigonometría",
+    "subTopic": "Triángulos rectángulos",
+    "createdAt": 1740961668875
+  },
+  {
+    "id": "cm7sbngrc0027hjmsl3vqpiql",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "1. ¿Cómo es la gráfica de la función $f(x) = x^2$?",
+    "answer": "Una línea recta que pasa por el origen.",
+    "mainTopic": "1.5 Funciones",
+    "subTopic": "Graficación de funciones",
+    "createdAt": 1740961709976
+  },
+  {
+    "id": "cm7sbngrc0028hjmsv3oc6jsw",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "¿Cuál es la graficación correcta para una función constante $f(x) = c$, donde $c$ es cualquier número real?",
+    "answer": "Todos los puntos caen en una recta horizontal.",
+    "mainTopic": "1.5 Funciones",
+    "subTopic": "Graficación de funciones",
+    "createdAt": 1740961709976
+  },
+  {
+    "id": "cm7sbngrc0029hjmsvjksi6sg",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "¿Cómo se verá la gráfica de la función $f(x) = x^3$?",
+    "answer": "Una línea recta que pasa por el origen.",
+    "mainTopic": "1.5 Funciones",
+    "subTopic": "Graficación de funciones",
+    "createdAt": 1740961709976
+  },
+  {
+    "id": "cm7sbngrc002ahjmsqmmifyka",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "Si una función $f(x)$ es simétrica con respecto al eje y, ¿qué afirmación es cierta?",
+    "answer": "$f(x) = f(-x)$ para todos los valores de $x$.",
+    "mainTopic": "1.5 Funciones",
+    "subTopic": "Graficación de funciones",
+    "createdAt": 1740961709976
+  },
+  {
+    "id": "cm7sco2k60051hjms5jeu9orb",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "Si en un experimento se lanzan dos dados justos y se toma como evento $A$ que la suma de los dos dados sea 7, ¿cuál es la probabilidad del evento $A$?",
+    "answer": "$\\frac{5}{36}$",
+    "mainTopic": "1.2 Probabilidad y estadística",
+    "subTopic": "Probabilidad",
+    "createdAt": 1740963417847
+  },
+  {
+    "id": "cm7sco2k60052hjmsd6lj5fc7",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "Se lanzan tres monedas. Si $A$ es el evento de que se obtengan al menos dos caras, ¿cuál es $P(A)$?",
+    "answer": "$\\frac{5}{8}$",
+    "mainTopic": "1.2 Probabilidad y estadística",
+    "subTopic": "Probabilidad",
+    "createdAt": 1740963417847
+  },
+  {
+    "id": "cm7scryy3007jhjmsnv0dteyl",
+    "userId": "cm7pqiccp00c8hjrsokmwpbqg",
+    "question": "Si la ecuación de una circunferencia es $(x - 5)^{2} + (y - 3)^{2} = 4$, ¿cuál es el centro de esta circunferencia?",
+    "answer": "$(5, 3)$",
+    "mainTopic": "1.4 Geometría analítica",
+    "subTopic": "Ecuación de la recta, de la circunferencia y de la parábola",
+    "createdAt": 1740963599788
+  },
+  {
+    "id": "cm7scryy3007khjms6qkute3g",
+    "userId": "cm7pqiccp00c8hjrsokmwpbqg",
+    "question": "Encuentra la ecuación de la recta que pasa por los puntos $(6, 4)$ y $(2, 2)$.",
+    "answer": "$y = 2x - 8$",
+    "mainTopic": "1.4 Geometría analítica",
+    "subTopic": "Ecuación de la recta, de la circunferencia y de la parábola",
+    "createdAt": 1740963599788
+  },
+  {
+    "id": "cm7scryy4007lhjmsqrdgrgve",
+    "userId": "cm7pqiccp00c8hjrsokmwpbqg",
+    "question": "Si una parábola tiene vértice en $(3,4)$ y foco en $(3,6)$, ¿cuál es su ecuación en la forma estándar?",
+    "answer": "$(x-3)^2 = 8(y-4)$",
+    "mainTopic": "1.4 Geometría analítica",
+    "subTopic": "Ecuación de la recta, de la circunferencia y de la parábola",
+    "createdAt": 1740963599788
+  },
+  {
+    "id": "cm7scryy4007mhjmspo7x5we1",
+    "userId": "cm7pqiccp00c8hjrsokmwpbqg",
+    "question": "La ecuación $3x - 2y = 6$ representa una recta. ¿Cuál es su ordenada al origen (intersección con el eje $y$)?",
+    "answer": "$3$",
+    "mainTopic": "1.4 Geometría analítica",
+    "subTopic": "Ecuación de la recta, de la circunferencia y de la parábola",
+    "createdAt": 1740963599788
+  },
+  {
+    "id": "cm7t9zo3n0012hjhsmypsbavw",
+    "userId": "cm7s62jez001whjfkfp6mit16",
+    "question": "Dado un círculo con un diámetro de 8 unidades, ¿cuál es la longitud de la circunferencia? Utiliza la fórmula $C = \\pi d$, donde $C$ es la circunferencia y $d$ es el diámetro.",
+    "answer": "$C = 16\\pi$ unidades",
+    "mainTopic": "1.3 Geometría y trigonometría",
+    "subTopic": "Circunferencia y círculo",
+    "createdAt": 1741019386307
+  },
+  {
+    "id": "cm7t9zo3n0013hjhsk0fzwugd",
+    "userId": "cm7s62jez001whjfkfp6mit16",
+    "question": "¿Cuál es el área de un círculo con un radio de 7 unidades? Usa la fórmula $A = \\pi r^2$.",
+    "answer": "$A = 49\\pi$ unidades cuadradas",
+    "mainTopic": "1.3 Geometría y trigonometría",
+    "subTopic": "Circunferencia y círculo",
+    "createdAt": 1741019386307
+  },
+  {
+    "id": "cm7t9zo3n0014hjhsc2fqldoc",
+    "userId": "cm7s62jez001whjfkfp6mit16",
+    "question": "Dada la ecuación $(x - 5)^2 + (y - 3)^2 = 16$, ¿cuál es el centro y el radio de la circunferencia?",
+    "answer": "Centro = (5, 3), Radio = 4",
+    "mainTopic": "1.3 Geometría y trigonometría",
+    "subTopic": "Circunferencia y círculo",
+    "createdAt": 1741019386307
+  },
+  {
+    "id": "cm7ta0n31001vhjhszye233ip",
+    "userId": "cm7s62jez001whjfkfp6mit16",
+    "question": "Si los lados de un triángulo rectángulo son $a = 3$, $b = 4$ y la hipotenusa $c$, ¿cuánto mide $c$?",
+    "answer": "$c = 5$",
+    "mainTopic": "1.3 Geometría y trigonometría",
+    "subTopic": "Triángulos rectángulos",
+    "createdAt": 1741019431646
+  },
+  {
+    "id": "cm7ta0n31001whjhsnumjtcoa",
+    "userId": "cm7s62jez001whjfkfp6mit16",
+    "question": "Dado un triángulo rectángulo con $a=8$ unidades y $b=15$ unidades, ¿cuánto vale la hipotenusa $c$? (Redondea la respuesta a una cifra decimal)",
+    "answer": "$c = 17.0$ unidades",
+    "mainTopic": "1.3 Geometría y trigonometría",
+    "subTopic": "Triángulos rectángulos",
+    "createdAt": 1741019431646
+  },
+  {
+    "id": "cm7ta0n31001xhjhsonuml67i",
+    "userId": "cm7s62jez001whjfkfp6mit16",
+    "question": "En un triángulo rectángulo con ángulos de $30^\\circ$, $60^\\circ$, y $90^\\circ$, si la hipotenusa $c$ mide $10$ unidades, ¿cuánto mide el lado opuesto al ángulo de $30^\\circ$?",
+    "answer": "$5$ unidades",
+    "mainTopic": "1.3 Geometría y trigonometría",
+    "subTopic": "Triángulos rectángulos",
+    "createdAt": 1741019431646
+  },
+  {
+    "id": "cm7ta0n31001yhjhsmfsrghy7",
+    "userId": "cm7s62jez001whjfkfp6mit16",
+    "question": "Si en un triángulo rectángulo el ángulo $\\theta$ se opone a un lado de longitud $7$ y la hipotenusa mide $25$, ¿cuánto vale $\\sin(\\theta)$?",
+    "answer": "$\\frac{7}{25}$",
+    "mainTopic": "1.3 Geometría y trigonometría",
+    "subTopic": "Triángulos rectángulos",
+    "createdAt": 1741019431646
+  },
+  {
+    "id": "cm7trgipr001ohj4kfpkrooa0",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "Si el primer término de una sucesión geométrica es $a_1 = 3$ y la razón es $r = 2$, ¿cuál será el cuarto término $a_4$?",
+    "answer": "$a_4 = 24$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Sucesiones",
+    "createdAt": 1741048725951
+  },
+  {
+    "id": "cm7trgips001phj4kfo68l3vv",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "¿Cómo se expresa el término general $a_n$ de una sucesión geométrica con término inicial $a_1$ y razón $r$?",
+    "answer": "$a_n = a_1 * r^n$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Sucesiones",
+    "createdAt": 1741048725951
+  },
+  {
+    "id": "cm7trgips001qhj4k9g9tk243",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "¿Cuál es la suma $S_n$ de los primeros $n$ términos de una sucesión aritmética con $a_1=1$ y $d=2$?",
+    "answer": "$S_n = n (2a_1 + (n-1)d) / 2$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Sucesiones",
+    "createdAt": 1741048725951
+  },
+  {
+    "id": "cm7trq9cg003jhj4kv5mhnbu1",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "1. ¿Cuál es el término general $a_n$ para la sucesión aritmética $3, 7, 11, 15,\\ldots $?",
+    "answer": "$a_n = 3+(n-1)\\cdot4$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Sucesiones",
+    "createdAt": 1741049180369
+  },
+  {
+    "id": "cm7trq9cg003khj4kjxmpha0f",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "Si la sucesión $a_n = 2^n$ es una sucesión geométrica, ¿cuál es la razón $r$?",
+    "answer": "$r = 2$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Sucesiones",
+    "createdAt": 1741049180369
+  },
+  {
+    "id": "cm7trq9cg003lhj4k7hoj0bio",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "Evalúa el término $a_5$ en la sucesión $a_n = n^2$.",
+    "answer": "$a_5 = 20$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Sucesiones",
+    "createdAt": 1741049180369
+  },
+  {
+    "id": "cm7trq9cg003mhj4k5vkm0f2p",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "¿Cuál de las siguientes sucesiones es una sucesión aritmética?",
+    "answer": "$1, 3, 5, 7, 9$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Sucesiones",
+    "createdAt": 1741049180369
+  },
+  {
+    "id": "cm7trq9cg003nhj4kehi0u5lw",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "¿Cuál de los siguientes no es una sucesión geométrica?",
+    "answer": "$1, 2, 4, 8, 16$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Sucesiones",
+    "createdAt": 1741049180369
+  },
+  {
+    "id": "cm7ts0zen0050hj4kqfa5o7dc",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "1. Considera la secuencia aritmética cuyo primer término es $5$ y la razón común es $2$. ¿Cuál es el sexto término de la secuencia?",
+    "answer": "$13$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Sucesiones",
+    "createdAt": 1741049680703
+  },
+  {
+    "id": "cm7ts0zen0051hj4kx9705r04",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "¿Cuál es la fórmula general para el $n$-ésimo término de una secuencia aritmética con primer término $a$ y razón común $d$?",
+    "answer": "$n = a + (n-1)d$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Sucesiones",
+    "createdAt": 1741049680703
+  },
+  {
+    "id": "cm7ts0zen0052hj4kwr3wwykb",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "Si una secuencia geométrica tiene un primer término de $2$ y una razón común de $3$, ¿cuál es el tercer término de la secuencia?",
+    "answer": "$8$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Sucesiones",
+    "createdAt": 1741049680703
+  },
+  {
+    "id": "cm7ts0zen0053hj4k25yhl7a6",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "¿Cuál es la fórmula general para el término $n$ de una secuencia geométrica donde el primer término es $a$ y la razón común es $r$?",
+    "answer": "$n = ar^n$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Sucesiones",
+    "createdAt": 1741049680703
+  },
+  {
+    "id": "cm7ts0zen0054hj4ktey48jhl",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "Tenemos una secuencia aritmética con primer término $4$ y última $-10$. Si la suma de todos los términos de la secuencia es $-9$, ¿cuántos términos tiene la secuencia?",
+    "answer": "$7$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Sucesiones",
+    "createdAt": 1741049680703
+  },
+  {
+    "id": "cm7tsdfny006nhj4kzswi0i3g",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "¿Cuántos términos tiene la serie $5,10,15,...,100$?",
+    "answer": "20",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Series",
+    "createdAt": 1741050261647
+  },
+  {
+    "id": "cm7tzxgpu007uhj4kex4cu80c",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "1. ¿Cuál es la suma de la serie aritmética $1 + 2 + 3 + \\ldots + 100$?",
+    "answer": "$$\\frac{101}{2}\\times 100$$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Series",
+    "createdAt": 1741062953442
+  },
+  {
+    "id": "cm7tzxgpu007vhj4kq5xpjxs4",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "Si  tenemos una serie geométrica, donde $r=2$ y $a=3$. ¿Cuál es el tercer término?",
+    "answer": "$6$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Series",
+    "createdAt": 1741062953442
+  },
+  {
+    "id": "cm7tzxgpu007whj4ks2113a7d",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "Tenemos una serie geométrica donde $a=5$ y $r=3$. Si los términos de la serie suman hasta 121, ¿qué valor tiene n?",
+    "answer": "$5$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Series",
+    "createdAt": 1741062953442
+  },
+  {
+    "id": "cm7tzxgpu007xhj4k5ulrmade",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "¿Cuál es la suma de la serie aritmética $3 + 6 + 9 + \\ldots + 99$?",
+    "answer": "$$\\frac{(3+99)\\times 33}{2}$$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Series",
+    "createdAt": 1741062953442
+  },
+  {
+    "id": "cm7tzxgpu007yhj4kws50w77p",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "Se da la serie geométrica infinita $2, -4, 8, -16, \\ldots$. ¿Cuál es la suma de la serie?",
+    "answer": "$-2$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Series",
+    "createdAt": 1741062953442
+  },
+  {
+    "id": "cm7u0pz100099hj4k63vnkt5g",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "1. ¿Cuál es la suma de la serie infinita $ \\sum_{n=1}^{\\infty} \\frac{1}{n^2}$ ?",
+    "answer": "$\\frac{\\pi^2}{6}$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Series",
+    "createdAt": 1741064283541
+  },
+  {
+    "id": "cm7u0r24p00a8hj4kf0wl8918",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "1. Si dos cantidades están en la razón de 3 a 5 y la suma es 40, ¿cuáles son las dos cantidades?",
+    "answer": "$15, 25$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Razones",
+    "createdAt": 1741064334218
+  },
+  {
+    "id": "cm7u0r24q00a9hj4kilq4pgbv",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "Si la razón de $x$ a $y$ es $7:3$, y $y = 9$, ¿cuál es el valor de $x$?",
+    "answer": "$21$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Razones",
+    "createdAt": 1741064334218
+  },
+  {
+    "id": "cm7u0r24q00aahj4kvoylo3rf",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "Si $a$ está en la razón de 2 a 3 con $b$, y $b = 18$, ¿cuál es el valor de $a$?",
+    "answer": "$10$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Razones",
+    "createdAt": 1741064334218
+  },
+  {
+    "id": "cm7u0r24q00abhj4k5su7uzen",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "Si las horas que trabajas están en la razón de 5 a 2 con las horas que duermes y has trabajado 15 horas, ¿cuántas horas has dormido?",
+    "answer": "$3$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Razones",
+    "createdAt": 1741064334218
+  },
+  {
+    "id": "cm7u0r24q00achj4kto4ghvcp",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "Un saco de azúcar se dividió en dos partes en la razón 3 a 2. Si una parte pesaba 18 kg, ¿cuánto pesa la otra parte?",
+    "answer": "$3 \\text{ kg}$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Razones",
+    "createdAt": 1741064334218
+  },
+  {
+    "id": "cm7u141jo00bxhj4ktt4bzv7d",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "1. Si se tiene una razón de $7:3$, ¿Cuál será su equivalente en formato decimal?",
+    "answer": "$2.33$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Razones",
+    "createdAt": 1741064939988
+  },
+  {
+    "id": "cm7u141jo00byhj4kb2x1vwzt",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "En el tema del álgebra, una \"razón\" se refiere a...",
+    "answer": "La relación que existe entre dos cantidades que se comparan",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Razones",
+    "createdAt": 1741064939988
+  },
+  {
+    "id": "cm7u2apx000ehhj4kabawthd6",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "¿Cuál es el coeficiente principal del polinomio $-3x^{5} + 2x^{4} - 5x^{2} + x - 6$?",
+    "answer": "-3",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Polinomios",
+    "createdAt": 1741066931125
+  },
+  {
+    "id": "cm7u2e5bi00fqhj4kmytmgqho",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "1. ¿Cuál es la ecuación de una recta con pendiente $4$ y que pasa por el punto $(1,2)$?",
+    "answer": "$y - 2 = 4(x - 1)$",
+    "mainTopic": "1.4 Geometría analítica",
+    "subTopic": "Ecuación de la recta, de la circunferencia y de la parábola",
+    "createdAt": 1741067091055
+  },
+  {
+    "id": "cm7u2ixz500hbhj4k0tmdzsgd",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "La distancia entre el punto $(9, 5)$ y la linea $4x - 3y + 12 = 0$ es:",
+    "answer": "$3$ unidades",
+    "mainTopic": "1.4 Geometría analítica",
+    "subTopic": "Lugar geométrico de rectas y curvas",
+    "createdAt": 1741067314817
+  },
+  {
+    "id": "cm7u2qyn700iohj4k8gn5csua",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "¿Cuál es la ecuación de la parábola que tiene el vértice en $(1,2)$ y el foco en $(1,5)$?",
+    "answer": "$(x-1)^2 = 4(y-2)$",
+    "mainTopic": "1.4 Geometría analítica",
+    "subTopic": "Pendiente y ángulo de inclinación",
+    "createdAt": 1741067688931
+  },
+  {
+    "id": "cm7um967q00khhj4ko5k8fkab",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "Una empresa tuvo $75$ ventas en noviembre, $100$ en diciembre y $125$ en enero. ¿Cuál es la razón de ventas de noviembre a diciembre a enero?",
+    "answer": "$3:4:5$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Razones",
+    "createdAt": 1741100451255
+  },
+  {
+    "id": "cm7um967q00kihj4kz1v9p4me",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "Si $p:q = 4:3$ y $q:r = 7:8$, entonces ¿cuál es la razón de $p:q:r$?",
+    "answer": "$28:21:24$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Razones",
+    "createdAt": 1741100451255
+  },
+  {
+    "id": "cm7umq9cx0010hj64r9v7l1i2",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "Si la razón entre dos números es $2:5$, y la suma de los dos números es $21$, ¿cuál es el valor más grande?",
+    "answer": "14",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Razones",
+    "createdAt": 1741101248482
+  },
+  {
+    "id": "cm7un4r500029hj64084gr02m",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "1. ¿Cuál es el grado del polinomio $3x^4 - 2x^3 + 5x^2 - 6x + 3$?",
+    "answer": "4",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Polinomios",
+    "createdAt": 1741101924708
+  },
+  {
+    "id": "cm7un4r50002ahj645in4op82",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "¿Cuántos términos tiene el polinomio $-3x^5 + 2x^2 - 3x + 1$?",
+    "answer": "4",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Polinomios",
+    "createdAt": 1741101924708
+  },
+  {
+    "id": "cm7un4r50002bhj64uest6fiw",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "¿Cuál es el coeficiente del término $x^2$ en el polinomio $5x^3 - 2x^2 + 3x - 1$?",
+    "answer": "-2",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Polinomios",
+    "createdAt": 1741101924708
+  },
+  {
+    "id": "cm7un4r50002chj64ixqnyi2d",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "¿El término constante del polinomio $9x^3 - 7x + 4$ es?",
+    "answer": "4",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Polinomios",
+    "createdAt": 1741101924708
+  },
+  {
+    "id": "cm7un4r50002dhj646z9yxkia",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "¿Cuál es el término de mayor grado en el polinomio $3x^3 - 5x^{5} + 2x^2 - 6x + 4$?",
+    "answer": "$-5x^{5}$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Polinomios",
+    "createdAt": 1741101924708
+  },
+  {
+    "id": "cm7wl6zv3000uhjy8gf4r3jam",
+    "userId": "cm7mhgrkr005ehjawnx4w7oja",
+    "question": "¿Cuál es la ecuación de la recta paralela a $y = 2x + 3$ y que pasa por el punto $(1, 4)$?",
+    "answer": "$y = 2x - 1$",
+    "mainTopic": "1.5 Funciones",
+    "subTopic": "Graficación de funciones",
+    "createdAt": 1741219602448
+  },
+  {
+    "id": "cm7wl6zv4000vhjy88hwrn3gc",
+    "userId": "cm7mhgrkr005ehjawnx4w7oja",
+    "question": "¿Cuál es la solución de la ecuación $2x + 5 = 3$?",
+    "answer": "$x = 1$",
+    "mainTopic": "1.5 Funciones",
+    "subTopic": "Graficación de funciones",
+    "createdAt": 1741219602448
+  },
+  {
+    "id": "cm7wlmk4t001ehj6cu5rnibxm",
+    "userId": "cm7mhgrkr005ehjawnx4w7oja",
+    "question": "¿Cuál de las siguientes opciones representa la ecuación de una parábola con vértice en el punto $V(3, -7)$?",
+    "answer": "$y = (x-3)^2 - 7$",
+    "mainTopic": "1.5 Funciones",
+    "subTopic": "Graficación de funciones",
+    "createdAt": 1741220328557
+  },
+  {
+    "id": "cm7wlmk4t001fhj6ce2xbqkv2",
+    "userId": "cm7mhgrkr005ehjawnx4w7oja",
+    "question": "Dada la función $f(x) = 2x^3 - 5x^2 + 4x - 1$, ¿cuál es el valor de $f(-1)$?",
+    "answer": "$-12$",
+    "mainTopic": "1.5 Funciones",
+    "subTopic": "Graficación de funciones",
+    "createdAt": 1741220328557
+  },
+  {
+    "id": "cm7wlmk4t001ghj6ceam8x2sy",
+    "userId": "cm7mhgrkr005ehjawnx4w7oja",
+    "question": "¿Cuál es el dominio de la función $g(x) = \\sqrt{4x - 5}$?",
+    "answer": "$x > \\frac{5}{4}$",
+    "mainTopic": "1.5 Funciones",
+    "subTopic": "Graficación de funciones",
+    "createdAt": 1741220328557
+  },
+  {
+    "id": "cm7wlmk4t001hhj6c2owzotgw",
+    "userId": "cm7mhgrkr005ehjawnx4w7oja",
+    "question": "Si $h(x) = |2x + 3|$, ¿cuál es el valor de $h(-2)$?",
+    "answer": "$1$",
+    "mainTopic": "1.5 Funciones",
+    "subTopic": "Graficación de funciones",
+    "createdAt": 1741220328557
+  },
+  {
+    "id": "cm7xjkf6t0014hjl0lvjcp26k",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "¿Cuál es el término general de la siguiente sucesión geométrica?",
+    "answer": "$a_n = 3 \\times 2^{n+1}$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Sucesiones",
+    "createdAt": 1741277335781
+  },
+  {
+    "id": "cm7xjkf6t0015hjl0td72ym42",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "¿Cuál es el término que falta en la siguiente sucesión aritmética?",
+    "answer": "13",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Sucesiones",
+    "createdAt": 1741277335781
+  },
+  {
+    "id": "cm83d6k34002jhjy083lgltg7",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "1. Simplifica el polinomio $(3x^2 + 5x - 2) - (2x^2 - 4x + 1)$.",
+    "answer": "$x^2 + x - 3$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Polinomios",
+    "createdAt": 1741629408304
+  },
+  {
+    "id": "cm83d6k34002khjy0sc4n8s2k",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "Factoriza el siguiente trinomio cuadrado perfecto: $x^2 + 6x + 9$.",
+    "answer": "$(x + 3)^2$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Polinomios",
+    "createdAt": 1741629408304
+  },
+  {
+    "id": "cm83d6k34002lhjy0ygy0l71p",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "Resuelve la ecuación $2x^2 - 5x + 2 = 0$.",
+    "answer": "$x = 2, x = -1/2$",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Polinomios",
+    "createdAt": 1741629408304
+  },
+  {
+    "id": "cm83d6k34002mhjy0zxefepun",
+    "userId": "cm7l1qpk90002hjw0uqk08m1k",
+    "question": "¿Cuál es el grado del polinomio $4x^4 - x^3 + 2x + 5$?",
+    "answer": "4",
+    "mainTopic": "1.1 Álgebra",
+    "subTopic": "Polinomios",
+    "createdAt": 1741629408304
+  },
+  {
+    "id": "cm83dgx4s003yhjy0y72a05nk",
+    "userId": "cm83dcpqf002thjy0hgbdyu7y",
+    "question": "1. ¿Cuál es la fórmula para el cálculo de la probabilidad de un evento?",
+    "answer": "$P(E) = \\dfrac{\\text{Casos favorables}}{\\text{Casos posibles}}$",
+    "mainTopic": "1.2 Probabilidad y estadística",
+    "subTopic": "Probabilidad",
+    "createdAt": 1741629891772
+  },
+  {
+    "id": "cm83dgx4s003zhjy09e6udae0",
+    "userId": "cm83dcpqf002thjy0hgbdyu7y",
+    "question": "Si lanzo un dado justo de seis caras, ¿cuál es la probabilidad de obtener un número impar?",
+    "answer": "$P(\\text{Número impar}) = \\dfrac{1}{3}$",
+    "mainTopic": "1.2 Probabilidad y estadística",
+    "subTopic": "Probabilidad",
+    "createdAt": 1741629891772
+  }
+]
