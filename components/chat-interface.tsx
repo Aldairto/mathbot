@@ -53,10 +53,9 @@ export default function ChatInterface() {
     setIsLoading(true)
 
     try {
+      // Intentamos con la ruta App Router
       console.log("[Chat] Enviando mensaje a /api/chat")
-
-      // Primero intentamos con la ruta App Router
-      let response = await fetch("/api/chat", {
+      const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -65,20 +64,6 @@ export default function ChatInterface() {
           messages: [...messages, userMessage],
         }),
       })
-
-      // Si falla con un error 404, intentamos con la ruta Pages Router
-      if (response.status === 404) {
-        console.log("[Chat] Ruta App Router no encontrada, intentando con Pages Router")
-        response = await fetch("/api/messages", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            messages: [...messages, userMessage],
-          }),
-        })
-      }
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
