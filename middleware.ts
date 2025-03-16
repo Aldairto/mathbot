@@ -12,30 +12,30 @@ export function middleware(request) {
   console.log(`[Middleware] Key Length: ${openAIKeyLength}`)
   console.log(`[Middleware] Environment: ${environment}`)
 
-  // Crear encabezados personalizados para depuración
-  const headers = new Headers(request.headers)
-  headers.set("x-debug-has-openai-key", hasOpenAIKey.toString())
-  headers.set("x-debug-environment", environment)
-
   // Solo redirigir al fallback si NO hay API key de OpenAI
-  if (!hasOpenAIKey && request.nextUrl.pathname === "/api/chat") {
-    console.log("[Middleware] Redirigiendo al fallback porque no hay API key de OpenAI")
+  if (!hasOpenAIKey) {
+    // Determinar la ruta de fallback basada en la ruta original
+    let fallbackPath = null
 
-    // Crear una respuesta con información de depuración
-    const response = NextResponse.rewrite(new URL("/api/chat-fallback", request.url))
-    response.headers.set("x-debug-reason", "missing-openai-key")
-    return response
+    if (request.nextUrl.pathname === "/api/messages") {
+      fallbackPath = "/api/messages-fallback"
+    } else if (request.nextUrl.pathname === "/api/chat") {
+      fallbackPath = "/api/chat-fallback"
+    }
+
+    if (fallbackPath) {
+      console.log(`[Middleware] Redirigiendo a ${fallbackPath} porque no hay API key de OpenAI`)
+
+      // Crear una respuesta con información de depuración
+      const response = NextResponse.rewrite(new URL(fallbackPath, request.url))
+      response.headers.set("x-debug-reason", "missing-openai-key")
+      return response
+    }
   }
 
   // En cualquier otro caso, continuar normalmente
   console.log("[Middleware] Continuando con la solicitud normal")
-  const response = NextResponse.next({
-    request: {
-      headers,
-    },
-  })
-
-  return response
+  return NextResponse.next()
 }
 
 export const config = {

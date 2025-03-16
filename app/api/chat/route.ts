@@ -2,7 +2,11 @@ import { NextResponse } from "next/server"
 import OpenAI from "openai"
 import prisma from "@/lib/prisma"
 import { getServerSession } from "next-auth/next"
-import { authOptions } from "@/pages/api/auth/[...nextauth]"
+import { authOptions } from "@/lib/auth" // Importar desde la ubicación centralizada
+
+// Añadir logs para depuración
+console.log("[API] Inicializando ruta /api/chat (App Router)")
+console.log("[API] ¿OpenAI API Key configurada?", !!process.env.OPENAI_API_KEY)
 
 // Inicializar OpenAI con la clave API
 const openai = new OpenAI({
@@ -41,34 +45,62 @@ async function formatLatexResponse(content: string): Promise<string> {
 
 // Manejador principal para solicitudes POST
 export async function POST(req: Request) {
+  console.log("[API] Recibida solicitud POST a /api/chat")
+
   try {
     // Verificar autenticación
+    console.log("[API] Verificando sesión de usuario")
     const session = await getServerSession(authOptions)
+    console.log("[API] Sesión:", session ? "Encontrada" : "No encontrada")
 
     if (!session || !(session as any).user || !(session as any).user.id) {
+      console.log("[API] Error: Usuario no autorizado")
       return NextResponse.json({ error: "No autorizado" }, { status: 401 })
     }
 
+    // Verificar si tenemos la API key de OpenAI
+    if (!process.env.OPENAI_API_KEY) {
+      console.error("[API] Error: OPENAI_API_KEY no está configurada")
+      return NextResponse.json(
+        {
+          error: "Configuración incompleta",
+          message: "La clave de API de OpenAI no está configurada",
+        },
+        { status: 503 },
+      )
+    }
+
     // Analizar el cuerpo de la solicitud
-    const { messages, generateQuiz, mainTopic, subTopic, includeCorrectAnswer } = await req.json()
+    const body = await req.json()
+    console.log("[API] Cuerpo de la solicitud recibido:", {
+      hasMessages: !!body.messages,
+      messageCount: body.messages?.length || 0,
+      generateQuiz: !!body.generateQuiz,
+    })
+
+    const { messages, generateQuiz, mainTopic, subTopic, includeCorrectAnswer } = body
     const userId = (session as any)?.user?.id || "anonymous"
 
     // Manejar generación de cuestionarios
     if (generateQuiz) {
+      console.log("[API] Generando cuestionario:", { mainTopic, subTopic })
       const quizContent = await generateQuestionnaire(mainTopic, subTopic, includeCorrectAnswer)
-      console.log("Contenido del cuestionario generado:", quizContent)
+      console.log("[API] Cuestionario generado con éxito")
       return NextResponse.json({ content: quizContent })
     }
 
     // Validar mensajes
     if (!Array.isArray(messages)) {
+      console.log("[API] Error: messages no es un array")
       throw new Error("messages debe ser un array")
     }
 
     // Obtener el último mensaje del usuario
     const lastUserMessage = messages[messages.length - 1].content
+    console.log("[API] Último mensaje del usuario:", lastUserMessage.substring(0, 50) + "...")
 
     // Llamar a la API de OpenAI
+    console.log("[API] Llamando a la API de OpenAI")
     const response = await openai.chat.completions.create({
       model: "gpt-4",
       messages: [
@@ -99,18 +131,21 @@ export async function POST(req: Request) {
         },
       ],
     })
+    console.log("[API] Respuesta recibida de OpenAI")
 
     // Verificar respuesta
     if (!response.choices || response.choices.length === 0) {
+      console.log("[API] Error: No se recibió una respuesta válida de OpenAI")
       throw new Error("No se recibió una respuesta válida de API")
     }
 
     // Formatear respuesta
     const content = await formatLatexResponse(response.choices[0].message.content || "")
-    console.log("Contenido formateado:", content)
+    console.log("[API] Contenido formateado:", content.substring(0, 50) + "...")
 
     // Guardar mensajes en la base de datos
     try {
+      console.log("[API] Guardando mensajes en la base de datos")
       // Guardar mensaje del usuario
       const userMessage = await prisma.message.create({
         data: {
@@ -120,7 +155,7 @@ export async function POST(req: Request) {
         },
       })
 
-      console.log("Mensaje del usuario guardado:", userMessage)
+      console.log("[API] Mensaje del usuario guardado:", userMessage.id)
 
       // Guardar mensaje del asistente
       const assistantMessage = await prisma.message.create({
@@ -131,15 +166,15 @@ export async function POST(req: Request) {
         },
       })
 
-      console.log("Mensaje del asistente guardado:", assistantMessage)
+      console.log("[API] Mensaje del asistente guardado:", assistantMessage.id)
 
       return NextResponse.json({ content: assistantMessage.content })
     } catch (dbError) {
-      console.error("Error al guardar mensajes en la base de datos:", dbError)
+      console.error("[API] Error al guardar mensajes en la base de datos:", dbError)
       return NextResponse.json({ error: "Error al guardar mensajes", details: dbError }, { status: 500 })
     }
   } catch (error: any) {
-    console.error("Error:", error)
+    console.error("[API] Error general:", error)
     return NextResponse.json({ error: error.message || "Hubo un error al procesar tu solicitud" }, { status: 500 })
   }
 }

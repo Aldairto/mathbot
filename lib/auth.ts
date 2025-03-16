@@ -29,10 +29,22 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        const isPasswordValid = await bcrypt.compare(credentials.password, user.password)
+        // Intentar comparar contraseñas con bcrypt
+        try {
+          const isPasswordValid = await bcrypt.compare(credentials.password, user.password)
 
-        if (!isPasswordValid) {
-          return null
+          if (!isPasswordValid) {
+            return null
+          }
+        } catch (error) {
+          console.error("Error al verificar contraseña:", error)
+          // Si hay un error con bcrypt, intentamos una comparación directa como fallback
+          // Esto es solo para desarrollo y depuración
+          if (process.env.NODE_ENV !== "production" && credentials.password === user.password) {
+            console.warn("Usando comparación directa de contraseñas como fallback")
+          } else {
+            return null
+          }
         }
 
         return {

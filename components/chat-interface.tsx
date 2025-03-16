@@ -1,233 +1,177 @@
 "use client"
 
-import type React from "react"
-import { useState, useRef, useEffect, useCallback } from "react"
-import { useSession } from "next-auth/react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Send, Loader2, ChevronDown } from "lucide-react"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { ChatMessage } from "@/components/chat-message"
-import { RelevantTopics } from "@/components/relevant-topics"
+import { useState, useEffect, useRef } from "react"
+import ReactMarkdown from "react-markdown"
+import remarkMath from "remark-math"
+import rehypeKatex from "rehype-katex"
+import "katex/dist/katex.min.css"
 
-type Message = {
-  role: "user" | "assistant" | "error"
-  content: string
-}
-
-type Topic = {
-  mainTopic: string
-  subTopic: string
-  importance: number
-}
-
-export function ChatInterface() {
-  const [messages, setMessages] = useState<Message[]>([])
+export default function ChatInterface() {
+  const [messages, setMessages] = useState([])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const scrollAreaRef = useRef<HTMLDivElement>(null)
-  const { data: session } = useSession()
-  const [showScrollButton, setShowScrollButton] = useState(false)
+  const [error, setError] = useState(null)
+  const messagesEndRef = useRef(null)
 
-  const scrollToBottom = useCallback(() => {
-    if (scrollAreaRef.current) {
-      const scrollContainer = scrollAreaRef.current.querySelector("[data-radix-scroll-area-viewport]")
-      if (scrollContainer) {
-        scrollContainer.scrollTop = scrollContainer.scrollHeight
-      }
-    }
-  }, [])
-
-  // Detectar cuando el usuario ha hecho scroll hacia arriba
-  const handleScroll = useCallback(() => {
-    if (scrollAreaRef.current) {
-      const scrollContainer = scrollAreaRef.current.querySelector("[data-radix-scroll-area-viewport]") as HTMLElement
-      if (scrollContainer) {
-        const { scrollTop, scrollHeight, clientHeight } = scrollContainer
-        const isNearBottom = scrollHeight - scrollTop - clientHeight < 100
-        setShowScrollButton(!isNearBottom)
-      }
-    }
+  useEffect(() => {
+    // Cargar mensajes al inicio
+    fetchMessages()
   }, [])
 
   useEffect(() => {
-    if (session?.user?.id) {
-      fetchMessages()
-    }
-  }, [session])
-
-  useEffect(() => {
+    // Scroll al último mensaje
     scrollToBottom()
-
-    // Añadir el evento de scroll
-    const scrollContainer = scrollAreaRef.current?.querySelector("[data-radix-scroll-area-viewport]")
-    if (scrollContainer) {
-      scrollContainer.addEventListener("scroll", handleScroll)
-      return () => scrollContainer.removeEventListener("scroll", handleScroll)
-    }
-  }, [scrollToBottom, handleScroll])
-
-  // Efecto para desplazarse al fondo cuando llegan nuevos mensajes
-  useEffect(() => {
-    scrollToBottom()
-  }, [scrollToBottom]) // Removed 'messages' dependency
+  }, [messages])
 
   const fetchMessages = async () => {
     try {
+      console.log("[Chat] Cargando mensajes anteriores")
       const response = await fetch("/api/messages")
       if (!response.ok) {
-        throw new Error(`Error al cargar los mensajes: ${response.status}`)
+        throw new Error(`Error al cargar mensajes: ${response.status}`)
       }
       const data = await response.json()
+      console.log(`[Chat] Cargados ${data.length} mensajes`)
       setMessages(data)
     } catch (error) {
-      console.error("Error al obtener mensajes:", error)
-      setError("Error al cargar los mensajes")
+      console.error("[Chat] Error al cargar mensajes:", error)
+      setError("No se pudieron cargar los mensajes anteriores.")
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!input.trim() || !session?.user?.id || isLoading) return
+    if (!input.trim()) return
 
-    setIsLoading(true)
+    // Limpiar error anterior
     setError(null)
-    const currentInput = input
-    setInput("") // Clear input immediately for better UX
+
+    // Agregar mensaje del usuario a la UI
+    const userMessage = { role: "user", content: input }
+    setMessages((prev) => [...prev, userMessage])
+    setInput("")
+    setIsLoading(true)
 
     try {
-      // Añadir mensaje del usuario inmediatamente para mejor UX
-      setMessages((prevMessages) => [...prevMessages, { role: "user", content: currentInput }])
+      console.log("[Chat] Enviando mensaje a /api/chat")
 
-      const response = await fetch("/api/chat", {
+      // Primero intentamos con la ruta App Router
+      let response = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          messages: [...messages, { role: "user", content: currentInput }],
-          userId: session.user.id,
+          messages: [...messages, userMessage],
         }),
       })
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || "Ocurrió un error desconocido")
+      // Si falla con un error 404, intentamos con la ruta Pages Router
+      if (response.status === 404) {
+        console.log("[Chat] Ruta App Router no encontrada, intentando con Pages Router")
+        response = await fetch("/api/messages", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            messages: [...messages, userMessage],
+          }),
+        })
       }
 
-      const assistantContent = data.content
-      console.log("Contenido recibido del asistente:", assistantContent)
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        console.error("[Chat] Error en respuesta:", response.status, errorData)
+        throw new Error(errorData.error || `Error en la respuesta del servidor: ${response.status}`)
+      }
 
-      setMessages((prevMessages) => [...prevMessages, { role: "assistant", content: assistantContent }])
+      const data = await response.json()
+      console.log("[Chat] Respuesta recibida correctamente")
+
+      // Agregar respuesta del asistente a la UI
+      setMessages((prev) => [...prev, { role: "assistant", content: data.content }])
     } catch (error) {
-      console.error("Error al enviar mensaje:", error)
-      setError(error instanceof Error ? error.message : "Ocurrió un error desconocido")
-      // Eliminar el mensaje del usuario si hay un error
-      setMessages((prevMessages) => prevMessages.slice(0, -1))
-      setInput(currentInput) // Restore input on error
+      console.error("[Chat] Error al enviar mensaje:", error)
+      setError(error.message || "Ocurrió un error desconocido")
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: `Error: ${error.message || "Ocurrió un error desconocido"}`,
+        },
+      ])
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleClearChat = async () => {
-    if (session?.user?.id) {
-      try {
-        await fetch("/api/messages", { method: "DELETE" })
-        setMessages([])
-      } catch (error) {
-        console.error("Error clearing messages:", error)
-        setError("Error al limpiar los mensajes")
-      }
-    }
-  }
-
-  const handleTopicSelect = async (topic: Topic) => {
-    const prompt = `Por favor, explícame el tema "${topic.mainTopic}" enfocándote en el subtema "${topic.subTopic}". Proporciona una explicación clara y concisa, incluyendo definiciones clave, ejemplos y, si es aplicable, fórmulas relevantes.`
-    setInput(prompt)
-  }
-
-  const scrollToBottomManually = () => {
-    scrollToBottom()
-    setShowScrollButton(false)
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }
 
   return (
-    <div className="flex flex-col w-full h-full border rounded-lg overflow-hidden bg-background shadow-lg">
-      <div className="flex-shrink-0">
-        <RelevantTopics onTopicSelect={handleTopicSelect} />
-      </div>
-      <ScrollArea className="flex-grow p-4" ref={scrollAreaRef}>
-        {Array.isArray(messages) &&
-          messages.map((message, index) => (
+    <div className="flex flex-col h-full">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <strong className="font-bold">Error: </strong>
+            <span className="block sm:inline">{error}</span>
+          </div>
+        )}
+
+        {messages.length === 0 && !isLoading && !error && (
+          <div className="text-center text-gray-500 dark:text-gray-400 my-8">
+            No hay mensajes. ¡Comienza una conversación!
+          </div>
+        )}
+
+        {messages.map((message, index) => (
+          <div key={index} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
             <div
-              key={`${message.role}-${index}`}
-              className={`mb-4 ${message.role === "user" ? "flex justify-end" : ""}`}
+              className={`max-w-[80%] rounded-lg p-3 ${
+                message.role === "user" ? "bg-blue-500 text-white" : "bg-gray-200 dark:bg-gray-700 dark:text-white"
+              }`}
             >
-              <div
-                className={`flex items-start space-x-2 max-w-[85%] ${
-                  message.role === "user" ? "flex-row-reverse space-x-reverse" : ""
-                }`}
-              >
-                {message.role === "user" ? (
-                  <Avatar className="w-6 h-6 mt-1">
-                    <AvatarFallback className="bg-primary text-primary-foreground text-xs">TÚ</AvatarFallback>
-                  </Avatar>
-                ) : (
-                  <Avatar className="w-6 h-6 mt-1">
-                    <AvatarImage src="/mathbot-avatar.png" alt="MathBot" />
-                    <AvatarFallback className="bg-primary text-primary-foreground text-xs">MB</AvatarFallback>
-                  </Avatar>
-                )}
-                <ChatMessage content={message.content} role={message.role as "assistant" | "user"} />
+              <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
+                {message.content}
+              </ReactMarkdown>
+            </div>
+          </div>
+        ))}
+        {isLoading && (
+          <div className="flex justify-start">
+            <div className="max-w-[80%] rounded-lg p-3 bg-gray-200 dark:bg-gray-700 dark:text-white">
+              <div className="flex space-x-2">
+                <div className="w-2 h-2 rounded-full bg-gray-500 animate-bounce"></div>
+                <div className="w-2 h-2 rounded-full bg-gray-500 animate-bounce delay-75"></div>
+                <div className="w-2 h-2 rounded-full bg-gray-500 animate-bounce delay-150"></div>
               </div>
             </div>
-          ))}
-        {error && (
-          <Alert variant="destructive" className="mb-4">
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
+          </div>
         )}
-      </ScrollArea>
-      {showScrollButton && (
-        <div className="relative">
-          <Button
-            onClick={scrollToBottomManually}
-            className="absolute bottom-16 right-4 rounded-full p-2 z-10 shadow-md"
-            size="icon"
-            variant="secondary"
-          >
-            <ChevronDown className="h-4 w-4" />
-          </Button>
-        </div>
-      )}
-      <div className="p-3 bg-background border-t">
-        <form onSubmit={handleSubmit} className="flex space-x-2 mb-2">
-          <Input
+        <div ref={messagesEndRef} />
+      </div>
+
+      <form onSubmit={handleSubmit} className="p-4 border-t dark:border-gray-700">
+        <div className="flex space-x-2">
+          <input
+            type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Escribe tu pregunta matemática..."
-            className="flex-grow"
+            placeholder="Escribe tu mensaje..."
+            className="flex-1 p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-700 dark:text-white"
             disabled={isLoading}
           />
-          <Button
+          <button
             type="submit"
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
-            disabled={isLoading || !input.trim()}
+            disabled={isLoading}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
           >
-            {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-            <span className="sr-only">Enviar</span>
-          </Button>
-        </form>
-        <Button onClick={handleClearChat} variant="outline" className="w-full text-sm h-8">
-          Limpiar chat
-        </Button>
-      </div>
+            Enviar
+          </button>
+        </div>
+      </form>
     </div>
   )
 }
