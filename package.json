@@ -72,7 +72,14 @@
     "tailwindcss": "^3.3.6",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.8.0",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "@types/bcrypt": "^5.0.2",
+    "@types/katex": "^0.16.7",
+    "@types/node": "^20.17.24",
+    "@types/nodemailer": "^6.4.14",
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.17",
+    "@types/react-katex": "^3.0.4"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
