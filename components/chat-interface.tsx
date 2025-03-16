@@ -6,7 +6,9 @@ import remarkMath from "remark-math"
 import rehypeKatex from "rehype-katex"
 import "katex/dist/katex.min.css"
 
+// Asegurarnos de que el componente se exporte como default
 export default function ChatInterface() {
+  // El resto del componente se mantiene igual
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -97,6 +99,7 @@ export default function ChatInterface() {
 
   return (
     <div className="flex flex-col h-full">
+      {/* ... resto del JSX ... */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
