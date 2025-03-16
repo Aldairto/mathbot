@@ -8,9 +8,27 @@ import { authOptions } from "@/lib/auth" // Importar desde la ubicación central
 console.log("[API] Inicializando ruta /api/chat (App Router)")
 console.log("[API] ¿OpenAI API Key configurada?", !!process.env.OPENAI_API_KEY)
 
+// Función para obtener la clave de API de OpenAI
+function getOpenAIKey() {
+  // Intentar obtener la clave de diferentes formas
+  const key =
+    process.env.OPENAI_API_KEY ||
+    process.env.NEXT_PUBLIC_OPENAI_API_KEY ||
+    process.env.openai_api_key ||
+    process.env.OpenAIApiKey
+
+  if (!key) {
+    console.error("[API] No se pudo encontrar la clave de API de OpenAI en ninguna variable de entorno")
+  } else {
+    console.log("[API] Clave de API de OpenAI encontrada con longitud:", key.length)
+  }
+
+  return key
+}
+
 // Inicializar OpenAI con la clave API
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: getOpenAIKey(),
 })
 
 // Función para formatear respuestas LaTeX
@@ -45,6 +63,15 @@ async function formatLatexResponse(content: string): Promise<string> {
 
 // Manejador principal para solicitudes POST
 export async function POST(req: Request) {
+  // NUEVOS LOGS PARA VERIFICAR LA REGIÓN
+  console.log("[API] Región de Vercel:", process.env.VERCEL_REGION)
+  console.log("[API] Entorno de Vercel:", process.env.VERCEL_ENV)
+  console.log("[API] Runtime de Next.js:", process.env.NEXT_RUNTIME)
+  console.log(
+    "[API] Variables de entorno disponibles:",
+    Object.keys(process.env).filter((key) => !key.includes("KEY") && !key.includes("SECRET") && !key.includes("TOKEN")),
+  )
+
   console.log("[API] Recibida solicitud POST a /api/chat")
 
   try {
@@ -101,77 +128,96 @@ export async function POST(req: Request) {
 
     // Llamar a la API de OpenAI
     console.log("[API] Llamando a la API de OpenAI")
-    const response = await openai.chat.completions.create({
-      model: "gpt-4",
-      messages: [
-        {
-          role: "system",
-          content: `Eres un asistente matemático llamado MathBot. 
-          Cuando uses expresiones matemáticas, SIEMPRE usa los siguientes delimitadores LaTeX:
-          - Para fórmulas en línea: $...$ (NO uses \$$ \$$)
-          - Para fórmulas en bloque: $$...$$ (NO uses \\[ \\])
-          - Para ecuaciones alineadas: $$\\begin{align*} ... \\end{align*}$$
-
-          Por ejemplo:
-          - En línea: La variable $x$ representa la incógnita
-          - En bloque: La ecuación es: 
-          $$y = mx + b$$
-
-          Es CRUCIAL que:
-          1. SIEMPRE uses $ $ para fórmulas en línea
-          2. SIEMPRE uses $$ $$ para fórmulas en bloque
-          3. NUNCA uses \$$ \$$ o \\[ \\]
-          4. SIEMPRE uses los delimitadores para CADA símbolo matemático
-          5. Usa asteriscos para énfasis (*cursiva* y **negrita**) en lugar de etiquetas HTML
-          6. SIEMPRE deja un espacio antes y después de cada expresión matemática`,
-        },
-        {
-          role: "user",
-          content: lastUserMessage,
-        },
-      ],
-    })
-    console.log("[API] Respuesta recibida de OpenAI")
-
-    // Verificar respuesta
-    if (!response.choices || response.choices.length === 0) {
-      console.log("[API] Error: No se recibió una respuesta válida de OpenAI")
-      throw new Error("No se recibió una respuesta válida de API")
-    }
-
-    // Formatear respuesta
-    const content = await formatLatexResponse(response.choices[0].message.content || "")
-    console.log("[API] Contenido formateado:", content.substring(0, 50) + "...")
-
-    // Guardar mensajes en la base de datos
     try {
-      console.log("[API] Guardando mensajes en la base de datos")
-      // Guardar mensaje del usuario
-      const userMessage = await prisma.message.create({
-        data: {
-          content: messages[messages.length - 1].content,
-          role: "user",
-          userId,
-        },
+      const response = await openai.chat.completions.create({
+        model: "gpt-4",
+        messages: [
+          {
+            role: "system",
+            content: `Eres un asistente matemático llamado MathBot. 
+            Cuando uses expresiones matemáticas, SIEMPRE usa los siguientes delimitadores LaTeX:
+            - Para fórmulas en línea: $...$ (NO uses \$$ \$$)
+            - Para fórmulas en bloque: $$...$$ (NO uses \\[ \\])
+            - Para ecuaciones alineadas: $$\\begin{align*} ... \\end{align*}$$
+
+            Por ejemplo:
+            - En línea: La variable $x$ representa la incógnita
+            - En bloque: La ecuación es: 
+            $$y = mx + b$$
+
+            Es CRUCIAL que:
+            1. SIEMPRE uses $ $ para fórmulas en línea
+            2. SIEMPRE uses $$ $$ para fórmulas en bloque
+            3. NUNCA uses \$$ \$$ o \\[ \\]
+            4. SIEMPRE uses los delimitadores para CADA símbolo matemático
+            5. Usa asteriscos para énfasis (*cursiva* y **negrita**) en lugar de etiquetas HTML
+            6. SIEMPRE deja un espacio antes y después de cada expresión matemática`,
+          },
+          {
+            role: "user",
+            content: lastUserMessage,
+          },
+        ],
       })
+      console.log("[API] Respuesta recibida de OpenAI")
 
-      console.log("[API] Mensaje del usuario guardado:", userMessage.id)
+      // Verificar respuesta
+      if (!response.choices || response.choices.length === 0) {
+        console.log("[API] Error: No se recibió una respuesta válida de OpenAI")
+        throw new Error("No se recibió una respuesta válida de API")
+      }
 
-      // Guardar mensaje del asistente
-      const assistantMessage = await prisma.message.create({
-        data: {
-          content,
-          role: "assistant",
-          userId,
+      // Formatear respuesta
+      const content = await formatLatexResponse(response.choices[0].message.content || "")
+      console.log("[API] Contenido formateado:", content.substring(0, 50) + "...")
+
+      // Guardar mensajes en la base de datos
+      try {
+        console.log("[API] Guardando mensajes en la base de datos")
+        // Guardar mensaje del usuario
+        const userMessage = await prisma.message.create({
+          data: {
+            content: messages[messages.length - 1].content,
+            role: "user",
+            userId,
+          },
+        })
+
+        console.log("[API] Mensaje del usuario guardado:", userMessage.id)
+
+        // Guardar mensaje del asistente
+        const assistantMessage = await prisma.message.create({
+          data: {
+            content,
+            role: "assistant",
+            userId,
+          },
+        })
+
+        console.log("[API] Mensaje del asistente guardado:", assistantMessage.id)
+
+        return NextResponse.json({ content: assistantMessage.content })
+      } catch (dbError) {
+        console.error("[API] Error al guardar mensajes en la base de datos:", dbError)
+        return NextResponse.json({ error: "Error al guardar mensajes", details: dbError }, { status: 500 })
+      }
+    } catch (openaiError) {
+      console.error("[API] Error completo de OpenAI:", JSON.stringify(openaiError, null, 2))
+
+      // Verifica si es un error de API
+      if (openaiError.response) {
+        console.error("[API] Status:", openaiError.response.status)
+        console.error("[API] Data:", openaiError.response.data)
+      }
+
+      return NextResponse.json(
+        {
+          error: "Error al llamar a OpenAI",
+          details: openaiError.message,
+          status: openaiError.response?.status || 500,
         },
-      })
-
-      console.log("[API] Mensaje del asistente guardado:", assistantMessage.id)
-
-      return NextResponse.json({ content: assistantMessage.content })
-    } catch (dbError) {
-      console.error("[API] Error al guardar mensajes en la base de datos:", dbError)
-      return NextResponse.json({ error: "Error al guardar mensajes", details: dbError }, { status: 500 })
+        { status: 500 },
+      )
     }
   } catch (error: any) {
     console.error("[API] Error general:", error)
@@ -233,4 +279,7 @@ async function generateQuestionnaire(
 
   return content
 }
+
+// Aumentar el tiempo máximo de ejecución para evitar timeouts
+export const maxDuration = 60 // 60 segundos
 
