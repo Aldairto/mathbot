@@ -5,11 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { InlineMath, BlockMath } from "react-katex"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import dynamic from "next/dynamic"
+import PdfDownloadButton from "@/components/pdf-download-button"
 import "katex/dist/katex.min.css"
-
-// Importar el generador de PDFs de forma dinámica
-const ClientPdfGenerator = dynamic(() => import("@/components/client-pdf-generator"), { ssr: false })
 
 type CorrectAnswer = {
   id: string
@@ -98,7 +95,7 @@ export function CorrectAnswersHistory() {
               ))}
             </SelectContent>
           </Select>
-          <ClientPdfGenerator
+          <PdfDownloadButton
             contentSelector="#correct-answers-content"
             filename={getPdfFilename()}
             title={getPdfTitle()}

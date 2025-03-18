@@ -9,10 +9,7 @@ import { LearningStats } from "@/components/learning-stats"
 import { CorrectAnswersHistory } from "@/components/correct-answers-history"
 import StudyTimeDisplay from "@/components/study-time-display"
 import { Skeleton } from "@/components/ui/skeleton"
-import dynamic from "next/dynamic"
-
-// Importar el generador de PDFs de forma dinámica
-const ClientPdfGenerator = dynamic(() => import("@/components/client-pdf-generator"), { ssr: false })
+import PdfDownloadButton from "@/components/pdf-download-button"
 
 type QuizResult = {
   mainTopic: string
@@ -25,7 +22,6 @@ export default function DashboardPage() {
   const { data: session, status } = useSession()
   const [quizResults, setQuizResults] = useState<QuizResult[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [contentReady, setContentReady] = useState(false)
 
   useEffect(() => {
     if (status === "authenticated" && session?.user && "id" in session.user) {
@@ -34,17 +30,6 @@ export default function DashboardPage() {
       setIsLoading(false)
     }
   }, [session, status])
-
-  // Marcar el contenido como listo después de que se cargue
-  useEffect(() => {
-    if (!isLoading) {
-      // Pequeño retraso para asegurar que el DOM esté completamente renderizado
-      const timer = setTimeout(() => {
-        setContentReady(true)
-      }, 500)
-      return () => clearTimeout(timer)
-    }
-  }, [isLoading])
 
   const fetchQuizResults = async () => {
     setIsLoading(true)
@@ -142,19 +127,11 @@ export default function DashboardPage() {
           <CardHeader>
             <div className="flex justify-between items-center">
               <CardTitle className="text-xl">Historial de Respuestas Correctas</CardTitle>
-              {contentReady && (
-                <ClientPdfGenerator
-                  title="Mis Preguntas Correctas"
-                  contentSelector="#correct-answers-content"
-                  filename="mis_preguntas_correctas.pdf"
-                />
-              )}
+              <PdfDownloadButton title="Mis Preguntas Correctas" contentSelector="#correct-answers-content" />
             </div>
           </CardHeader>
           <CardContent>
-            <div id="correct-answers-content">
-              <CorrectAnswersHistory />
-            </div>
+            <CorrectAnswersHistory />
           </CardContent>
         </Card>
       </div>
