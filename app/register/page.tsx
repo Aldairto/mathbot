@@ -59,7 +59,13 @@ export default function RegisterPage() {
             </div>
           </div>
         </div>
-
+        
+        <div className="bg-muted p-4 rounded-lg">
+          <p className="text-sm italic">
+            "MathBot ha transformado mi forma de estudiar matemáticas. Ahora entiendo conceptos que antes me parecían imposibles."
+          </p>
+        </div>
+      </div>
       
       {/* Formulario de registro */}
       <Card className="w-full max-w-md mx-auto shadow-lg border-muted/40">
