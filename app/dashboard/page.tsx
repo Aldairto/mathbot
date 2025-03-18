@@ -9,7 +9,6 @@ import { LearningStats } from "@/components/learning-stats"
 import { CorrectAnswersHistory } from "@/components/correct-answers-history"
 import StudyTimeDisplay from "@/components/study-time-display"
 import { Skeleton } from "@/components/ui/skeleton"
-import ClientPdfGenerator from "@/components/client-pdf-generator"
 
 type QuizResult = {
   mainTopic: string
@@ -127,11 +126,6 @@ export default function DashboardPage() {
           <CardHeader>
             <div className="flex justify-between items-center">
               <CardTitle className="text-xl">Historial de Respuestas Correctas</CardTitle>
-              <ClientPdfGenerator
-                contentSelector="#correct-answers-content"
-                title="Mis Preguntas Correctas"
-                filename="preguntas-correctas.pdf"
-              />
             </div>
           </CardHeader>
           <CardContent>

@@ -1,25 +1,24 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
+import { SimpleButton } from "@/components/ui/simple-button"
 import { Download, Loader2 } from "lucide-react"
 import html2canvas from "html2canvas"
 import jsPDF from "jspdf"
-import "katex/dist/katex.min.css"
 
-interface ClientPdfGeneratorProps {
-  contentSelector: string
+interface PdfDownloadButtonProps {
   title?: string
+  contentSelector: string
   filename?: string
   className?: string
 }
 
-export default function ClientPdfGenerator({
-  contentSelector,
+export default function PdfDownloadButton({
   title = "Mis Preguntas Correctas",
-  filename = "preguntas-correctas.pdf",
+  contentSelector,
+  filename = "historial_respuestas_correctas.pdf",
   className = "",
-}: ClientPdfGeneratorProps) {
+}: PdfDownloadButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false)
 
   const generatePDF = async () => {
@@ -39,14 +38,13 @@ export default function ClientPdfGenerator({
       contentClone.style.padding = "20px"
       contentClone.style.backgroundColor = "white"
       contentClone.style.color = "black"
-      contentClone.style.width = "800px" // Ancho fijo para mejor formato
 
       // Crear un contenedor temporal para renderizar el contenido
       const tempContainer = document.createElement("div")
       tempContainer.style.position = "absolute"
       tempContainer.style.left = "-9999px"
       tempContainer.style.top = "0"
-      tempContainer.style.width = "800px"
+      tempContainer.style.width = "800px" // Ancho fijo para mejor formato
 
       // Añadir título
       const titleElement = document.createElement("h1")
@@ -67,23 +65,11 @@ export default function ClientPdfGenerator({
       katexLink.href = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
       tempContainer.appendChild(katexLink)
 
-      // Esperar a que se carguen los estilos
-      await new Promise((resolve) => setTimeout(resolve, 500))
-
-      // Renderizar fórmulas matemáticas con KaTeX
-      const mathElements = tempContainer.querySelectorAll(".math, .katex")
-      if (window.katex && mathElements.length > 0) {
-        mathElements.forEach((element) => {
-          try {
-            if (element.classList.contains("math") && !element.classList.contains("katex")) {
-              const formula = element.textContent || ""
-              const isDisplay = element.classList.contains("display")
-              window.katex.render(formula, element, { displayMode: isDisplay })
-            }
-          } catch (error) {
-            console.error("Error al renderizar fórmula:", error)
-          }
-        })
+      // Pre-renderizar las fórmulas matemáticas con KaTeX
+      const mathElements = tempContainer.querySelectorAll(".katex, .katex-display")
+      if (mathElements.length > 0) {
+        // Si hay elementos KaTeX, asegurarse de que estén completamente renderizados
+        await new Promise((resolve) => setTimeout(resolve, 500))
       }
 
       // Convertir el contenido a canvas
@@ -92,6 +78,13 @@ export default function ClientPdfGenerator({
         useCORS: true,
         logging: false,
         allowTaint: true,
+        onclone: (clonedDoc) => {
+          // Asegurarse de que los estilos de KaTeX se apliquen correctamente en el clon
+          const katexStyles = document.querySelectorAll("style[data-katex]")
+          katexStyles.forEach((style) => {
+            clonedDoc.head.appendChild(style.cloneNode(true))
+          })
+        },
       })
 
       // Crear PDF
@@ -126,19 +119,16 @@ export default function ClientPdfGenerator({
   }
 
   return (
-    <Button onClick={generatePDF} variant="outline" size="sm" disabled={isGenerating} className={className}>
-      {isGenerating ? (
-        <span className="flex items-center">
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Generando...
-        </span>
-      ) : (
-        <span className="flex items-center">
-          <Download className="mr-2 h-4 w-4" />
-          Descargar PDF
-        </span>
-      )}
-    </Button>
+    <SimpleButton
+      onClick={generatePDF}
+      variant="outline"
+      size="icon"
+      disabled={isGenerating}
+      title="Descargar PDF"
+      className={className}
+    >
+      {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+    </SimpleButton>
   )
 }
 
