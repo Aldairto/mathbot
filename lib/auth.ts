@@ -3,8 +3,14 @@ import type { NextAuthOptions } from "next-auth"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import prisma from "@/lib/prisma"
 import CredentialsProvider from "next-auth/providers/credentials"
+import { type ClassValue, clsx } from "clsx"
+import { twMerge } from "tailwind-merge"
 // Comentamos la importación de bcryptjs temporalmente
 // import bcrypt from "bcryptjs";
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -73,3 +79,68 @@ export const authOptions: NextAuthOptions = {
   },
 }
 
+// Tipos para extender la sesión de NextAuth
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string
+      name?: string | null
+      email?: string | null
+      image?: string | null
+      role: string
+    }
+  }
+
+  interface User {
+    role: string
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    role: string
+  }
+}
+
+// Función de ayuda para verificar roles
+export function hasRequiredRole(session: any, requiredRoles: string[]): boolean {
+  if (!session || !session.user || !session.user.role) {
+    return false
+  }
+  return requiredRoles.includes(session.user.role)
+}
+
+// Función para verificar autenticación en el servidor
+export async function getServerAuthSession() {
+  return await getServerSession(authOptions)
+}
+
+// Función para verificar autenticación en el cliente
+export function useRequireAuth(redirectTo = "/login") {
+  const { data: session, status } = useSession()
+  const router = useRouter()
+  
+  useEffect(() => {
+    if (status === "loading") return
+    if (!session) {
+      router.push(redirectTo)
+    }
+  }, [session, status, router, redirectTo])
+  
+  return { session, status }
+}
+
+// Función para verificar rol en el cliente
+export function useRequireRole(requiredRoles: string[], redirectTo = "/unauthorized") {
+  const { session, status } = useRequireAuth()
+  const router = useRouter()
+  
+  useEffect(() => {
+    if (status === "loading") return
+    if (session && !hasRequiredRole(session, requiredRoles)) {
+      router.push(redirectTo)
+    }
+  }, [session, status, router, redirectTo, requiredRoles])
+  
+  return { session, status, hasRole: session ? hasRequiredRole(session, requiredRoles) : false }
+}

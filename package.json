@@ -48,6 +48,7 @@
     "cmdk": "^0.2.0",
     "date-fns": "^3.0.0",
     "embla-carousel-react": "^8.0.0",
+    "framer-motion": "^12.5.0",
     "input-otp": "^1.0.1",
     "jspdf": "^2.5.1",
     "katex": "^0.16.21",
