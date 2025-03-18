@@ -80,15 +80,7 @@ export default function RegisterPage() {
         </CardContent>
         <CardFooter className="flex flex-col space-y-4 pt-0">
           <div className="text-sm text-center text-muted-foreground">
-            Al registrarte, aceptas nuestros{" "}
-            <Link href="/terms" className="underline underline-offset-4 hover:text-primary">
-              Términos de servicio
-            </Link>{" "}
-            y{" "}
-            <Link href="/privacy" className="underline underline-offset-4 hover:text-primary">
-              Política de privacidad
-            </Link>
-            .
+          
           </div>
           <div className="text-sm text-center">
             ¿Ya tienes una cuenta?{" "}
