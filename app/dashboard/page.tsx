@@ -6,12 +6,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress"
 import { UserProgress } from "@/components/user-progress"
 import { LearningStats } from "@/components/learning-stats"
-import { CorrectAnswersHistory } from "@/components/correct-answers-history"
-import StudyTimeDisplay from "@/components/study-time-display"
 import { Skeleton } from "@/components/ui/skeleton"
 import dynamic from "next/dynamic"
 
-// Importar el componente de forma dinámica para evitar errores de SSR
+// Importar componentes que usan APIs del navegador de forma dinámica
+const StudyTimeDisplay = dynamic(() => import("@/components/study-time-display"), { ssr: false })
+const CorrectAnswersHistory = dynamic(
+  () => import("@/components/correct-answers-history").then((mod) => mod.CorrectAnswersHistory),
+  { ssr: false },
+)
 const PdfDownloadButton = dynamic(() => import("@/components/pdf-download-button"), { ssr: false })
 
 type QuizResult = {
@@ -105,7 +108,7 @@ export default function DashboardPage() {
               <CardTitle className="text-2xl">Bienvenido, {session?.user?.name || "Estudiante"}</CardTitle>
               <CardDescription>Aquí tienes un resumen de tu progreso</CardDescription>
             </div>
-            <StudyTimeDisplay />
+            {contentReady && <StudyTimeDisplay />}
           </div>
         </CardHeader>
       </Card>
@@ -152,9 +155,7 @@ export default function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div id="correct-answers-content">
-              <CorrectAnswersHistory />
-            </div>
+            <div id="correct-answers-content">{contentReady && <CorrectAnswersHistory />}</div>
           </CardContent>
         </Card>
       </div>
