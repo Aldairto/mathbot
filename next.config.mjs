@@ -2,8 +2,6 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  // Configuración para la salida de producción
-  output: 'standalone',
   // Ignorar errores de TypeScript durante la compilación
   typescript: {
     ignoreBuildErrors: true,
@@ -25,26 +23,13 @@ const nextConfig = {
     }
     return config
   },
-  // Configuración experimental
+  // Excluir rutas específicas de la compilación estática
   experimental: {
-    // Mantener configuraciones existentes
+    // Esto evitará que Next.js intente compilar la ruta /api/chat durante la compilación
     excludeDefaultMomentLocales: true,
-    serverComponentsExternalPackages: ['bcrypt'],
-    // Desactivar la generación estática para las páginas que usan componentes del cliente
-    appDir: true,
-  },
-  // Excluir todas las páginas problemáticas del prerenderizado estático
-  unstable_excludeFiles: [
-    'app/dashboard/**',
-    'app/quizzes/**',
-    'app/settings/**',
-    'app/forgot-password/**',
-    'app/reset-password/**',
-    'app/login/**',
-    'app/register/**',
-    'app/profile/**',
-    'app/chat/**'
-  ],
+    serverComponentsExternalPackages: ['bcrypt']
+  }
 }
 
 export default nextConfig
+
