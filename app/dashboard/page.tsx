@@ -9,7 +9,6 @@ import { LearningStats } from "@/components/learning-stats"
 import { CorrectAnswersHistory } from "@/components/correct-answers-history"
 import StudyTimeDisplay from "@/components/study-time-display"
 import { Skeleton } from "@/components/ui/skeleton"
-import PdfDownloadButton from "@/components/pdf-download-button"
 
 type QuizResult = {
   mainTopic: string
@@ -24,7 +23,7 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    if (status === "authenticated" && session?.user && "id" in session.user) {
+      if (status === "authenticated" && session?.user && 'id' in session.user) {
       fetchQuizResults()
     } else if (status === "unauthenticated") {
       setIsLoading(false)
@@ -125,10 +124,7 @@ export default function DashboardPage() {
         </Card>
         <Card className="col-span-2">
           <CardHeader>
-            <div className="flex justify-between items-center">
-              <CardTitle className="text-xl">Historial de Respuestas Correctas</CardTitle>
-              <PdfDownloadButton title="Mis Preguntas Correctas" contentSelector="#correct-answers-content" />
-            </div>
+            <CardTitle className="text-xl">Historial de Respuestas Correctas</CardTitle>
           </CardHeader>
           <CardContent>
             <CorrectAnswersHistory />

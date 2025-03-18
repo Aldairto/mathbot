@@ -1,11 +1,12 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { InlineMath, BlockMath } from "react-katex"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import PdfDownloadButton from "@/components/pdf-download-button"
+import { Button } from "@/components/ui/button"
+import { Download, Loader2 } from "lucide-react"
 import "katex/dist/katex.min.css"
 
 type CorrectAnswer = {
@@ -22,7 +23,7 @@ export function CorrectAnswersHistory() {
   const [filteredAnswers, setFilteredAnswers] = useState<CorrectAnswer[]>([])
   const [topics, setTopics] = useState<string[]>([])
   const [selectedTopic, setSelectedTopic] = useState<string>("all")
-  const contentRef = useRef<HTMLDivElement>(null)
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
 
   useEffect(() => {
     fetchCorrectAnswers()
@@ -53,7 +54,7 @@ export function CorrectAnswersHistory() {
   }
 
   const renderMathExpression = (text: string) => {
-    const parts = text.split(/(\$\$.*?\$\$|\$.*?\$)/gs)
+    const parts = text.split(/(\$\$.*?\$\$|\$.*?\$)/g)
     return parts.map((part, index) => {
       if (part.startsWith("$$") && part.endsWith("$$")) {
         return <BlockMath key={index} math={part.slice(2, -2)} />
@@ -65,16 +66,35 @@ export function CorrectAnswersHistory() {
     })
   }
 
-  const getPdfFilename = () => {
-    return selectedTopic === "all"
-      ? "historial_respuestas_correctas.pdf"
-      : `historial_respuestas_correctas_${selectedTopic.replace(/\s+/g, "_")}.pdf`
-  }
+  const generatePDF = async () => {
+    setIsGeneratingPDF(true)
+    try {
+      const response = await fetch("/api/generate-pdf", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ selectedTopic }),
+      })
 
-  const getPdfTitle = () => {
-    return selectedTopic === "all"
-      ? "Historial de Respuestas Correctas"
-      : `Historial de Respuestas Correctas - ${selectedTopic}`
+      if (response.ok) {
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement("a")
+        a.style.display = "none"
+        a.href = url
+        a.download = "historial_respuestas_correctas.pdf"
+        document.body.appendChild(a)
+        a.click()
+        window.URL.revokeObjectURL(url)
+      } else {
+        throw new Error("Error al generar el PDF")
+      }
+    } catch (error) {
+      console.error("Error al generar el PDF:", error)
+    } finally {
+      setIsGeneratingPDF(false)
+    }
   }
 
   return (
@@ -95,32 +115,24 @@ export function CorrectAnswersHistory() {
               ))}
             </SelectContent>
           </Select>
-          <PdfDownloadButton
-            contentSelector="#correct-answers-content"
-            filename={getPdfFilename()}
-            title={getPdfTitle()}
-          />
+          <Button onClick={generatePDF} variant="outline" size="icon" disabled={isGeneratingPDF}>
+            {isGeneratingPDF ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+          </Button>
         </div>
       </CardHeader>
       <CardContent>
-        {filteredAnswers.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">No hay respuestas correctas para mostrar</div>
-        ) : (
-          <ScrollArea className="h-[300px]">
-            <div id="correct-answers-content" ref={contentRef}>
-              {filteredAnswers.map((answer) => (
-                <div key={answer.id} className="mb-4 p-2 border-b">
-                  <p className="font-semibold">{renderMathExpression(answer.question)}</p>
-                  <p>Respuesta: {renderMathExpression(answer.answer)}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {answer.mainTopic} - {answer.subTopic}
-                  </p>
-                  <p className="text-xs text-muted-foreground">{new Date(answer.createdAt).toLocaleString()}</p>
-                </div>
-              ))}
+        <ScrollArea className="h-[300px]">
+          {filteredAnswers.map((answer) => (
+            <div key={answer.id} className="mb-4 p-2 border-b">
+              <p className="font-semibold">{renderMathExpression(answer.question)}</p>
+              <p>Respuesta: {renderMathExpression(answer.answer)}</p>
+              <p className="text-sm text-muted-foreground">
+                {answer.mainTopic} - {answer.subTopic}
+              </p>
+              <p className="text-xs text-muted-foreground">{new Date(answer.createdAt).toLocaleString()}</p>
             </div>
-          </ScrollArea>
-        )}
+          ))}
+        </ScrollArea>
       </CardContent>
     </Card>
   )
