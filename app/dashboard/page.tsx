@@ -6,16 +6,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress"
 import { UserProgress } from "@/components/user-progress"
 import { LearningStats } from "@/components/learning-stats"
+import { CorrectAnswersHistory } from "@/components/correct-answers-history"
+import StudyTimeDisplay from "@/components/study-time-display"
 import { Skeleton } from "@/components/ui/skeleton"
 import dynamic from "next/dynamic"
 
-// Importar componentes que usan APIs del navegador de forma dinámica
-const StudyTimeDisplay = dynamic(() => import("@/components/study-time-display"), { ssr: false })
-const CorrectAnswersHistory = dynamic(
-  () => import("@/components/correct-answers-history").then((mod) => mod.CorrectAnswersHistory),
-  { ssr: false },
-)
-const PdfDownloadButton = dynamic(() => import("@/components/pdf-download-button"), { ssr: false })
+// Importar el generador de PDFs de forma dinámica
+const ClientPdfGenerator = dynamic(() => import("@/components/client-pdf-generator"), { ssr: false })
 
 type QuizResult = {
   mainTopic: string
@@ -108,7 +105,7 @@ export default function DashboardPage() {
               <CardTitle className="text-2xl">Bienvenido, {session?.user?.name || "Estudiante"}</CardTitle>
               <CardDescription>Aquí tienes un resumen de tu progreso</CardDescription>
             </div>
-            {contentReady && <StudyTimeDisplay />}
+            <StudyTimeDisplay />
           </div>
         </CardHeader>
       </Card>
@@ -146,7 +143,7 @@ export default function DashboardPage() {
             <div className="flex justify-between items-center">
               <CardTitle className="text-xl">Historial de Respuestas Correctas</CardTitle>
               {contentReady && (
-                <PdfDownloadButton
+                <ClientPdfGenerator
                   title="Mis Preguntas Correctas"
                   contentSelector="#correct-answers-content"
                   filename="mis_preguntas_correctas.pdf"
@@ -155,7 +152,9 @@ export default function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div id="correct-answers-content">{contentReady && <CorrectAnswersHistory />}</div>
+            <div id="correct-answers-content">
+              <CorrectAnswersHistory />
+            </div>
           </CardContent>
         </Card>
       </div>

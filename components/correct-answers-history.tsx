@@ -3,13 +3,13 @@
 import { useState, useEffect, useRef } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import dynamic from "next/dynamic"
+import { InlineMath, BlockMath } from "react-katex"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import dynamic from "next/dynamic"
 import "katex/dist/katex.min.css"
 
-// Importar KaTeX de forma dinámica para evitar errores de SSR
-const InlineMath = dynamic(() => import("react-katex").then((mod) => mod.InlineMath), { ssr: false })
-const BlockMath = dynamic(() => import("react-katex").then((mod) => mod.BlockMath), { ssr: false })
+// Importar el generador de PDFs de forma dinámica
+const ClientPdfGenerator = dynamic(() => import("@/components/client-pdf-generator"), { ssr: false })
 
 type CorrectAnswer = {
   id: string
@@ -56,11 +56,6 @@ export function CorrectAnswersHistory() {
   }
 
   const renderMathExpression = (text: string) => {
-    // Verificar si el componente InlineMath y BlockMath están cargados
-    if (typeof InlineMath === "undefined" || typeof BlockMath === "undefined") {
-      return <span>{text}</span>
-    }
-
     const parts = text.split(/(\$\$.*?\$\$|\$.*?\$)/gs)
     return parts.map((part, index) => {
       if (part.startsWith("$$") && part.endsWith("$$")) {
@@ -103,6 +98,11 @@ export function CorrectAnswersHistory() {
               ))}
             </SelectContent>
           </Select>
+          <ClientPdfGenerator
+            contentSelector="#correct-answers-content"
+            filename={getPdfFilename()}
+            title={getPdfTitle()}
+          />
         </div>
       </CardHeader>
       <CardContent>

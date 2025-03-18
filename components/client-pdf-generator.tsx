@@ -3,27 +3,34 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Download, Loader2 } from "lucide-react"
-import html2canvas from "html2canvas"
-import jsPDF from "jspdf"
+import dynamic from "next/dynamic"
 
-interface PdfDownloadButtonProps {
+// Importar html2canvas y jsPDF de forma dinámica para evitar errores de SSR
+const html2canvasModule = dynamic(() => import("html2canvas"), { ssr: false })
+const jsPDFModule = dynamic(() => import("jspdf"), { ssr: false })
+
+interface ClientPdfGeneratorProps {
   title?: string
   contentSelector: string
   filename?: string
   className?: string
 }
 
-export default function PdfDownloadButton({
+export default function ClientPdfGenerator({
   title = "Mis Preguntas Correctas",
   contentSelector,
   filename = "historial_respuestas_correctas.pdf",
   className = "",
-}: PdfDownloadButtonProps) {
+}: ClientPdfGeneratorProps) {
   const [isGenerating, setIsGenerating] = useState(false)
 
   const generatePDF = async () => {
     setIsGenerating(true)
     try {
+      // Cargar dinámicamente las bibliotecas
+      const html2canvas = (await html2canvasModule).default
+      const jsPDF = (await jsPDFModule).default
+
       // Seleccionar el contenido a convertir en PDF
       const content = document.querySelector(contentSelector)
 
