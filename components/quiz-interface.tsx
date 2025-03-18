@@ -6,11 +6,12 @@ import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Loader2, RefreshCw } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Loader2, RefreshCw, CheckCircle2, XCircle } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { InlineMath, BlockMath } from "react-katex"
+import { Progress } from "@/components/ui/progress"
 import "katex/dist/katex.min.css"
 
 const topics = {
@@ -44,6 +45,7 @@ type Question = {
   options: string[]
   correctAnswer: string
   userAnswer?: string
+  explanation?: string
 }
 
 export function QuizInterface() {
@@ -56,9 +58,13 @@ export function QuizInterface() {
   const [showResults, setShowResults] = useState(false)
   const [attemptCount, setAttemptCount] = useState(1)
   const [refreshKey, setRefreshKey] = useState(0)
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
+  const [viewMode, setViewMode] = useState<"all" | "one-by-one">("all")
 
   const loadQuizState = useCallback(async () => {
-    if (session?.user?.id) {
+    if (!session?.user?.id) return;
+    
+    try {
       // Primero, intentamos cargar desde localStorage
       const localState = localStorage.getItem(`quizState_${session.user.id}`)
       if (localState) {
@@ -68,64 +74,79 @@ export function QuizInterface() {
         setSelectedSubTopic(parsedState.selectedSubTopic)
         setShowResults(parsedState.showResults)
         setAttemptCount(parsedState.attemptCount)
+        setCurrentQuestionIndex(parsedState.currentQuestionIndex || 0)
+        setViewMode(parsedState.viewMode || "all")
       }
 
       // Luego, intentamos cargar desde el servidor
-      try {
-        const response = await fetch("/api/user-quiz-state")
-        if (response.ok) {
-          const serverState = await response.json()
-          if (
-            serverState &&
-            (!localState || new Date(serverState.updatedAt) > new Date(JSON.parse(localState).updatedAt))
-          ) {
-            // Si el estado del servidor es más reciente, lo usamos
-            setQuiz(serverState.quiz)
-            setSelectedMainTopic(serverState.selectedMainTopic)
-            setSelectedSubTopic(serverState.selectedSubTopic)
-            setShowResults(serverState.showResults)
-            setAttemptCount(serverState.attemptCount)
-            // Actualizamos localStorage con el estado más reciente
-            localStorage.setItem(
-              `quizState_${session.user.id}`,
-              JSON.stringify({
-                ...serverState,
-                updatedAt: new Date().toISOString(),
-              }),
-            )
-          }
+      const response = await fetch("/api/user-quiz-state")
+      if (response.ok) {
+        const serverState = await response.json()
+        if (
+          serverState &&
+          (!localState || new Date(serverState.updatedAt) > new Date(JSON.parse(localState).updatedAt))
+        ) {
+          // Si el estado del servidor es más reciente, lo usamos
+          setQuiz(serverState.quiz)
+          setSelectedMainTopic(serverState.selectedMainTopic)
+          setSelectedSubTopic(serverState.selectedSubTopic)
+          setShowResults(serverState.showResults)
+          setAttemptCount(serverState.attemptCount)
+          setCurrentQuestionIndex(serverState.currentQuestionIndex || 0)
+          setViewMode(serverState.viewMode || "all")
+          
+          // Actualizamos localStorage con el estado más reciente
+          localStorage.setItem(
+            `quizState_${session.user.id}`,
+            JSON.stringify({
+              ...serverState,
+              updatedAt: new Date().toISOString(),
+            }),
+          )
         }
-      } catch (error) {
-        console.error("Error al cargar el estado del servidor:", error)
       }
+    } catch (error) {
+      console.error("Error al cargar el estado del cuestionario:", error)
     }
   }, [session?.user?.id])
 
   const saveQuizState = useCallback(async () => {
-    if (session?.user?.id) {
+    if (!session?.user?.id || !quiz) return;
+    
+    try {
       const state = {
         quiz,
         selectedMainTopic,
         selectedSubTopic,
         showResults,
         attemptCount,
+        currentQuestionIndex,
+        viewMode,
         updatedAt: new Date().toISOString(),
       }
+      
       // Guardamos en localStorage
       localStorage.setItem(`quizState_${session.user.id}`, JSON.stringify(state))
 
       // Guardamos en el servidor
-      try {
-        await fetch("/api/user-quiz-state", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ state }),
-        })
-      } catch (error) {
-        console.error("Error al guardar el estado en el servidor:", error)
-      }
+      await fetch("/api/user-quiz-state", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ state }),
+      })
+    } catch (error) {
+      console.error("Error al guardar el estado en el servidor:", error)
     }
-  }, [session?.user?.id, quiz, selectedMainTopic, selectedSubTopic, showResults, attemptCount])
+  }, [
+    session?.user?.id, 
+    quiz, 
+    selectedMainTopic, 
+    selectedSubTopic, 
+    showResults, 
+    attemptCount, 
+    currentQuestionIndex, 
+    viewMode
+  ])
 
   useEffect(() => {
     loadQuizState()
@@ -135,7 +156,7 @@ export function QuizInterface() {
     if (quiz) {
       saveQuizState()
     }
-  }, [saveQuizState, quiz])
+  }, [saveQuizState, quiz, currentQuestionIndex, viewMode])
 
   const handleGenerateQuiz = async () => {
     if (!selectedMainTopic || !selectedSubTopic) return
@@ -145,6 +166,7 @@ export function QuizInterface() {
     setQuiz(null)
     setShowResults(false)
     setAttemptCount(1)
+    setCurrentQuestionIndex(0)
 
     try {
       const response = await fetch("/api/chat", {
@@ -159,12 +181,12 @@ export function QuizInterface() {
         }),
       })
 
-      const data = await response.json()
-
       if (!response.ok) {
+        const data = await response.json()
         throw new Error(data.error || "Ocurrió un error desconocido")
       }
 
+      const data = await response.json()
       const parsedQuiz = parseQuizContent(data.content)
       setQuiz(parsedQuiz)
       setRefreshKey((prevKey) => prevKey + 1)
@@ -181,13 +203,34 @@ export function QuizInterface() {
     return questions.map((q) => {
       const lines = q.split("\n").filter((line) => line.trim() !== "")
       const questionText = lines[0].trim()
-      const options = lines.slice(1, -1).map((o) => o.replace(/^[a-d]\)\s*/, "").trim())
-      const correctAnswer = lines[lines.length - 1].replace("Respuesta correcta: ", "").trim().toLowerCase()
+      
+      // Buscar la línea que contiene "Respuesta correcta:"
+      const correctAnswerLineIndex = lines.findIndex(line => 
+        line.toLowerCase().includes("respuesta correcta:"))
+      
+      // Extraer opciones hasta la línea de respuesta correcta
+      const options = lines.slice(1, correctAnswerLineIndex).map((o) => 
+        o.replace(/^[a-d]\)\s*/, "").trim())
+      
+      // Extraer la respuesta correcta
+      const correctAnswerLine = lines[correctAnswerLineIndex]
+      const correctAnswer = correctAnswerLine
+        .replace(/respuesta correcta:\s*/i, "")
+        .trim()
+        .toLowerCase()
+      
+      // Buscar explicación si existe (después de la respuesta correcta)
+      let explanation = ""
+      if (correctAnswerLineIndex < lines.length - 1) {
+        explanation = lines.slice(correctAnswerLineIndex + 1).join("\n")
+      }
+
       return {
         question: questionText,
         options,
         correctAnswer: correctAnswer.length === 1 ? correctAnswer : "a", // Fallback to 'a' if not a single letter
         userAnswer: "",
+        explanation
       }
     })
   }
@@ -196,14 +239,13 @@ export function QuizInterface() {
     if (!quiz) return
 
     const updatedQuiz = quiz.map((q, index) => (index === questionIndex ? { ...q, userAnswer: answer } : q))
-
     setQuiz(updatedQuiz)
 
     const currentQuestion = updatedQuiz[questionIndex]
     const isCorrect = currentQuestion.correctAnswer === answer
 
     try {
-      const response = await fetch("/api/quiz-results", {
+      await fetch("/api/quiz-results", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -214,20 +256,17 @@ export function QuizInterface() {
           correct: isCorrect,
         }),
       })
-
-      if (!response.ok) {
-        throw new Error("Error al guardar el resultado del cuestionario")
-      }
-
-      console.log("Resultado guardado correctamente")
     } catch (error) {
       console.error("Error al guardar el resultado:", error)
     }
   }
 
   const handleSubmitQuiz = async () => {
+    if (!quiz) return;
+    
     setShowResults(true)
-    const correctQuestions = quiz?.filter((q) => q.correctAnswer.toLowerCase() === q.userAnswer?.toLowerCase()) || []
+    const correctQuestions = quiz.filter((q) => 
+      q.correctAnswer.toLowerCase() === q.userAnswer?.toLowerCase())
 
     if (correctQuestions.length > 0) {
       try {
@@ -254,6 +293,7 @@ export function QuizInterface() {
   const handleRetakeQuiz = () => {
     setShowResults(false)
     setAttemptCount((prevCount) => prevCount + 1)
+    setCurrentQuestionIndex(0)
     setQuiz((prevQuiz) => (prevQuiz ? prevQuiz.map((q) => ({ ...q, userAnswer: "" })) : null))
   }
 
@@ -265,7 +305,9 @@ export function QuizInterface() {
   }
 
   const renderMathExpression = (text: string) => {
-    const parts = text.split(/(\$\$.*?\$\$|\$.*?\$)/g)
+    if (!text) return null;
+    
+    const parts = text.split(/(\$\$.*?\$\$|\$.*?\$)/gs)
     return parts.map((part, index) => {
       if (part.startsWith("$$") && part.endsWith("$$")) {
         return <BlockMath key={index} math={part.slice(2, -2)} />
@@ -277,52 +319,164 @@ export function QuizInterface() {
     })
   }
 
+  const handleNextQuestion = () => {
+    if (!quiz) return;
+    if (currentQuestionIndex < quiz.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1)
+    }
+  }
+
+  const handlePrevQuestion = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1)
+    }
+  }
+
+  const toggleViewMode = () => {
+    setViewMode(viewMode === "all" ? "one-by-one" : "all")
+  }
+
+  const getAnsweredQuestionsCount = () => {
+    if (!quiz) return 0;
+    return quiz.filter(q => q.userAnswer).length;
+  }
+
   useEffect(() => {
     if (quiz) {
       setRefreshKey((prevKey) => prevKey + 1)
     }
   }, [quiz])
 
+  const renderQuestion = (question: Question, index: number) => (
+    <div key={`${index}-${refreshKey}`} className="mb-8 p-4 bg-secondary/30 rounded-lg">
+      <h3 className="text-lg font-semibold mb-4">
+        {index + 1}. {renderMathExpression(question.question)}
+      </h3>
+      <RadioGroup
+        onValueChange={(value) => handleAnswerChange(index, value)}
+        value={question.userAnswer}
+        disabled={showResults}
+        className="space-y-2"
+      >
+        {question.options.map((option, optionIndex) => {
+          const optionLetter = String.fromCharCode(97 + optionIndex)
+          const isCorrect = optionLetter === question.correctAnswer
+          const isSelected = question.userAnswer === optionLetter
+          return (
+            <div
+              key={`${optionIndex}-${refreshKey}`}
+              className={`flex items-start space-x-2 p-2 rounded-md ${
+                showResults 
+                  ? isCorrect 
+                    ? "bg-green-100 dark:bg-green-900/20" 
+                    : isSelected 
+                      ? "bg-red-100 dark:bg-red-900/20" 
+                      : "hover:bg-accent"
+                  : "hover:bg-accent"
+              }`}
+            >
+              <RadioGroupItem value={optionLetter} id={`q${index}-option${optionIndex}`} className="mt-1" />
+              <Label
+                htmlFor={`q${index}-option${optionIndex}`}
+                className={`flex-grow cursor-pointer ${
+                  showResults
+                    ? isCorrect
+                      ? "text-green-600 dark:text-green-400 font-semibold"
+                      : isSelected
+                        ? "text-red-600 dark:text-red-400"
+                        : ""
+                    : ""
+                }`}
+              >
+                <div className="flex items-start">
+                  <span className="mr-2">{optionLetter.toUpperCase()})</span>
+                  <div className="flex-1">{renderMathExpression(option)}</div>
+                  {showResults && isCorrect && <CheckCircle2 className="text-green-600 dark:text-green-400 ml-2 h-5 w-5 flex-shrink-0" />}
+                  {showResults && !isCorrect && isSelected && <XCircle className="text-red-600 dark:text-red-400 ml-2 h-5 w-5 flex-shrink-0" />}
+                </div>
+              </Label>
+            </div>
+          )
+        })}
+      </RadioGroup>
+      {showResults && question.explanation && (
+        <div className="mt-4 p-3 bg-blue-100 dark:bg-blue-900/20 rounded-md">
+          <h4 className="font-semibold text-blue-800 dark:text-blue-300">Explicación:</h4>
+          <div className="text-blue-700 dark:text-blue-200">{renderMathExpression(question.explanation)}</div>
+        </div>
+      )}
+    </div>
+  )
+
   return (
     <div className="flex flex-col w-full h-full border rounded-lg overflow-hidden bg-background shadow-lg">
       <div className="p-4 space-y-4 bg-muted/20">
-        <Select
-          onValueChange={(value) => {
-            setSelectedMainTopic(value)
-            setSelectedSubTopic("")
-          }}
-          value={selectedMainTopic}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Selecciona un tema principal" />
-          </SelectTrigger>
-          <SelectContent>
-            {Object.keys(topics).map((topic) => (
-              <SelectItem key={topic} value={topic}>
-                {topic}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {selectedMainTopic && (
-          <Select onValueChange={setSelectedSubTopic} value={selectedSubTopic}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Select
+            onValueChange={(value) => {
+              setSelectedMainTopic(value)
+              setSelectedSubTopic("")
+            }}
+            value={selectedMainTopic}
+          >
             <SelectTrigger>
-              <SelectValue placeholder="Selecciona un subtema" />
+              <SelectValue placeholder="Selecciona un tema principal" />
             </SelectTrigger>
             <SelectContent>
-              {topics[selectedMainTopic as keyof typeof topics].map((subTopic) => (
-                <SelectItem key={subTopic} value={subTopic}>
-                  {subTopic}
+              {Object.keys(topics).map((topic) => (
+                <SelectItem key={topic} value={topic}>
+                  {topic}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-        )}
-        <Button onClick={handleGenerateQuiz} disabled={!selectedMainTopic || !selectedSubTopic || isLoading}>
-          {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-          Generar Cuestionario
-        </Button>
+          {selectedMainTopic && (
+            <Select onValueChange={setSelectedSubTopic} value={selectedSubTopic}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecciona un subtema" />
+              </SelectTrigger>
+              <SelectContent>
+                {topics[selectedMainTopic as keyof typeof topics].map((subTopic) => (
+                  <SelectItem key={subTopic} value={subTopic}>
+                    {subTopic}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        </div>
+        <div className="flex justify-between items-center">
+          <Button onClick={handleGenerateQuiz} disabled={!selectedMainTopic || !selectedSubTopic || isLoading}>
+            {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+            Generar Cuestionario
+          </Button>
+          {quiz && (
+            <Button variant="outline" onClick={toggleViewMode}>
+              {viewMode === "all" ? "Ver pregunta por pregunta" : "Ver todas las preguntas"}
+            </Button>
+          )}
+        </div>
       </div>
+      
+      {quiz && (
+        <div className="px-4 py-2 bg-muted/10 border-t border-b">
+          <div className="flex justify-between items-center">
+            <div className="text-sm text-muted-foreground">
+              Respondidas: {getAnsweredQuestionsCount()} de {quiz.length}
+            </div>
+            {viewMode === "one-by-one" && (
+              <div className="text-sm font-medium">
+                Pregunta {currentQuestionIndex + 1} de {quiz.length}
+              </div>
+            )}
+          </div>
+          <Progress 
+            value={(getAnsweredQuestionsCount() / quiz.length) * 100} 
+            className="h-2 mt-1" 
+          />
+        </div>
+      )}
+      
       <ScrollArea className="flex-grow p-4">
         {error && (
           <Alert variant="destructive" className="mb-4">
@@ -330,89 +484,78 @@ export function QuizInterface() {
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
+        
         {quiz && (
           <Card className="mb-4" key={refreshKey}>
             <CardHeader>
               <CardTitle>
                 Cuestionario: {selectedMainTopic} - {selectedSubTopic}
               </CardTitle>
-              <CardDescription>Responde a las siguientes preguntas:</CardDescription>
+              <CardDescription>
+                {showResults 
+                  ? "Revisa tus respuestas y la retroalimentación:" 
+                  : "Responde a las siguientes preguntas:"}
+              </CardDescription>
             </CardHeader>
+            
             <CardContent>
-              {quiz.map((question, index) => (
-                <div key={`${index}-${refreshKey}`} className="mb-8 p-4 bg-secondary rounded-lg">
-                  <h3 className="text-lg font-semibold mb-4">
-                    {index + 1}. {renderMathExpression(question.question)}
-                  </h3>
-                  <RadioGroup
-                    onValueChange={(value) => handleAnswerChange(index, value)}
-                    value={question.userAnswer}
-                    disabled={showResults}
-                    className="space-y-2"
+              {viewMode === "all" ? (
+                // Mostrar todas las preguntas
+                quiz.map((question, index) => renderQuestion(question, index))
+              ) : (
+                // Mostrar una pregunta a la vez
+                quiz[currentQuestionIndex] && renderQuestion(quiz[currentQuestionIndex], currentQuestionIndex)
+              )}
+            </CardContent>
+            
+            <CardFooter className="flex flex-col sm:flex-row gap-4">
+              {viewMode === "one-by-one" && (
+                <div className="flex gap-2 w-full sm:w-auto">
+                  <Button 
+                    variant="outline" 
+                    onClick={handlePrevQuestion}
+                    disabled={currentQuestionIndex === 0}
                   >
-                    {question.options.map((option, optionIndex) => {
-                      const optionLetter = String.fromCharCode(97 + optionIndex)
-                      const isCorrect = optionLetter === question.correctAnswer
-                      const isSelected = question.userAnswer === optionLetter
-                      return (
-                        <div
-                          key={`${optionIndex}-${refreshKey}`}
-                          className="flex items-start space-x-2 p-2 rounded-md hover:bg-accent"
-                        >
-                          <RadioGroupItem value={optionLetter} id={`q${index}-option${optionIndex}`} className="mt-1" />
-                          <Label
-                            htmlFor={`q${index}-option${optionIndex}`}
-                            className={`flex-grow cursor-pointer ${
-                              showResults
-                                ? isCorrect
-                                  ? "text-green-600 font-semibold"
-                                  : isSelected
-                                    ? "text-red-600 line-through"
-                                    : ""
-                                : ""
-                            }`}
-                          >
-                            {optionLetter}) {renderMathExpression(option)}
-                            {showResults && isCorrect && <span className="text-green-600 ml-2">✓ Correcta</span>}
-                          </Label>
-                        </div>
-                      )
-                    })}
-                  </RadioGroup>
-                  {showResults && (
-                    <div className="mt-4 text-green-600 font-semibold">
-                      La respuesta correcta es:{" "}
-                      {String.fromCharCode(
-                        97 +
-                          question.options.findIndex(
-                            (_, index) => String.fromCharCode(97 + index) === question.correctAnswer,
-                          ),
-                      ).toUpperCase()}
-                    </div>
-                  )}
+                    Anterior
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={handleNextQuestion}
+                    disabled={currentQuestionIndex === quiz.length - 1}
+                  >
+                    Siguiente
+                  </Button>
                 </div>
-              ))}
+              )}
+              
               {!showResults ? (
-                <Button onClick={handleSubmitQuiz} className="mt-4">
-                  Enviar respuestas
+                <Button 
+                  onClick={handleSubmitQuiz} 
+                  className="w-full sm:w-auto"
+                  disabled={getAnsweredQuestionsCount() < quiz.length}
+                >
+                  {getAnsweredQuestionsCount() < quiz.length 
+                    ? `Faltan ${quiz.length - getAnsweredQuestionsCount()} respuestas` 
+                    : "Enviar respuestas"}
                 </Button>
               ) : (
-                <div className="mt-4 space-y-4">
-                  <h3 className="text-xl font-bold">Resultados (Intento {attemptCount})</h3>
-                  <p>
-                    Puntuación: {calculateScore()} de {quiz.length} (
-                    {((calculateScore() / quiz.length) * 100).toFixed(2)}%)
-                  </p>
+                <div className="w-full space-y-4">
+                  <div className="bg-muted p-4 rounded-lg">
+                    <h3 className="text-xl font-bold">Resultados (Intento {attemptCount})</h3>
+                    <p className="text-lg">
+                      Puntuación: {calculateScore()} de {quiz.length} (
+                      {((calculateScore() / quiz.length) * 100).toFixed(2)}%)
+                    </p>
+                  </div>
                   <Button onClick={handleRetakeQuiz} className="flex items-center">
                     <RefreshCw className="mr-2 h-4 w-4" /> Volver a resolver
                   </Button>
                 </div>
               )}
-            </CardContent>
+            </CardFooter>
           </Card>
         )}
       </ScrollArea>
     </div>
   )
 }
-
