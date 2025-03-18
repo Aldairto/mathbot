@@ -9,6 +9,7 @@ import { LearningStats } from "@/components/learning-stats"
 import { CorrectAnswersHistory } from "@/components/correct-answers-history"
 import StudyTimeDisplay from "@/components/study-time-display"
 import { Skeleton } from "@/components/ui/skeleton"
+import ClientPdfGenerator from "@/components/client-pdf-generator"
 
 type QuizResult = {
   mainTopic: string
@@ -23,7 +24,7 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-      if (status === "authenticated" && session?.user && 'id' in session.user) {
+    if (status === "authenticated" && session?.user && "id" in session.user) {
       fetchQuizResults()
     } else if (status === "unauthenticated") {
       setIsLoading(false)
@@ -124,7 +125,14 @@ export default function DashboardPage() {
         </Card>
         <Card className="col-span-2">
           <CardHeader>
-            <CardTitle className="text-xl">Historial de Respuestas Correctas</CardTitle>
+            <div className="flex justify-between items-center">
+              <CardTitle className="text-xl">Historial de Respuestas Correctas</CardTitle>
+              <ClientPdfGenerator
+                contentSelector="#correct-answers-content"
+                title="Mis Preguntas Correctas"
+                filename="preguntas-correctas.pdf"
+              />
+            </div>
           </CardHeader>
           <CardContent>
             <CorrectAnswersHistory />
