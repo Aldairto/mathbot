@@ -5,8 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { InlineMath, BlockMath } from "react-katex"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import PdfDownloadButton from "@/components/pdf-download-button"
+import dynamic from "next/dynamic"
 import "katex/dist/katex.min.css"
+
+// Importar el componente de forma dinámica para evitar errores de SSR
+const PdfDownloadButton = dynamic(() => import("@/components/pdf-download-button"), { ssr: false })
 
 type CorrectAnswer = {
   id: string
@@ -23,6 +26,7 @@ export function CorrectAnswersHistory() {
   const [topics, setTopics] = useState<string[]>([])
   const [selectedTopic, setSelectedTopic] = useState<string>("all")
   const contentRef = useRef<HTMLDivElement>(null)
+  const [contentReady, setContentReady] = useState(false)
 
   useEffect(() => {
     fetchCorrectAnswers()
@@ -35,6 +39,17 @@ export function CorrectAnswersHistory() {
       setFilteredAnswers(correctAnswers.filter((answer) => answer.mainTopic === selectedTopic))
     }
   }, [selectedTopic, correctAnswers])
+
+  // Marcar el contenido como listo después de que se cargue
+  useEffect(() => {
+    if (correctAnswers.length > 0) {
+      // Pequeño retraso para asegurar que el DOM esté completamente renderizado
+      const timer = setTimeout(() => {
+        setContentReady(true)
+      }, 500)
+      return () => clearTimeout(timer)
+    }
+  }, [correctAnswers])
 
   const fetchCorrectAnswers = async () => {
     try {
@@ -95,11 +110,13 @@ export function CorrectAnswersHistory() {
               ))}
             </SelectContent>
           </Select>
-          <PdfDownloadButton
-            contentSelector="#correct-answers-content"
-            filename={getPdfFilename()}
-            title={getPdfTitle()}
-          />
+          {contentReady && (
+            <PdfDownloadButton
+              contentSelector="#correct-answers-content"
+              filename={getPdfFilename()}
+              title={getPdfTitle()}
+            />
+          )}
         </div>
       </CardHeader>
       <CardContent>

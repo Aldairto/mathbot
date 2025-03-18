@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { SimpleButton } from "@/components/ui/simple-button"
+import { Button } from "@/components/ui/button"
 import { Download, Loader2 } from "lucide-react"
 import html2canvas from "html2canvas"
 import jsPDF from "jspdf"
@@ -107,18 +107,19 @@ export default function PdfDownloadButton({
   }
 
   return (
-    <SimpleButton
-      onClick={generatePDF}
-      variant="outline"
-      size="icon"
-      disabled={isGenerating}
-      title="Descargar PDF"
-      className={className}
-    >
-      {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-    </SimpleButton>
+    <Button onClick={generatePDF} variant="outline" size="sm" disabled={isGenerating} className={className}>
+      {isGenerating ? (
+        <span className="flex items-center">
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          Generando...
+        </span>
+      ) : (
+        <span className="flex items-center">
+          <Download className="mr-2 h-4 w-4" />
+          Descargar PDF
+        </span>
+      )}
+    </Button>
   )
 }
-
-
 
