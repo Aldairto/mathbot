@@ -23,7 +23,7 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    if (status === "authenticated" && session?.user && "id" in session.user) {
+      if (status === "authenticated" && session?.user && 'id' in session.user) {
       fetchQuizResults()
     } else if (status === "unauthenticated") {
       setIsLoading(false)
@@ -124,9 +124,7 @@ export default function DashboardPage() {
         </Card>
         <Card className="col-span-2">
           <CardHeader>
-            <div className="flex justify-between items-center">
-              <CardTitle className="text-xl">Historial de Respuestas Correctas</CardTitle>
-            </div>
+            <CardTitle className="text-xl">Historial de Respuestas Correctas</CardTitle>
           </CardHeader>
           <CardContent>
             <CorrectAnswersHistory />
