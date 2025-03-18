@@ -9,7 +9,10 @@ import { LearningStats } from "@/components/learning-stats"
 import { CorrectAnswersHistory } from "@/components/correct-answers-history"
 import StudyTimeDisplay from "@/components/study-time-display"
 import { Skeleton } from "@/components/ui/skeleton"
-import PdfDownloadButton from "@/components/pdf-download-button"
+import dynamic from "next/dynamic"
+
+// Importar el componente de forma dinámica para evitar errores de SSR
+const PdfDownloadButton = dynamic(() => import("@/components/pdf-download-button"), { ssr: false })
 
 type QuizResult = {
   mainTopic: string
@@ -22,6 +25,7 @@ export default function DashboardPage() {
   const { data: session, status } = useSession()
   const [quizResults, setQuizResults] = useState<QuizResult[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [contentReady, setContentReady] = useState(false)
 
   useEffect(() => {
     if (status === "authenticated" && session?.user && "id" in session.user) {
@@ -30,6 +34,17 @@ export default function DashboardPage() {
       setIsLoading(false)
     }
   }, [session, status])
+
+  // Marcar el contenido como listo después de que se cargue
+  useEffect(() => {
+    if (!isLoading) {
+      // Pequeño retraso para asegurar que el DOM esté completamente renderizado
+      const timer = setTimeout(() => {
+        setContentReady(true)
+      }, 500)
+      return () => clearTimeout(timer)
+    }
+  }, [isLoading])
 
   const fetchQuizResults = async () => {
     setIsLoading(true)
@@ -127,11 +142,19 @@ export default function DashboardPage() {
           <CardHeader>
             <div className="flex justify-between items-center">
               <CardTitle className="text-xl">Historial de Respuestas Correctas</CardTitle>
-              <PdfDownloadButton title="Mis Preguntas Correctas" contentSelector="#correct-answers-content" />
+              {contentReady && (
+                <PdfDownloadButton
+                  title="Mis Preguntas Correctas"
+                  contentSelector="#correct-answers-content"
+                  filename="mis_preguntas_correctas.pdf"
+                />
+              )}
             </div>
           </CardHeader>
           <CardContent>
-            <CorrectAnswersHistory />
+            <div id="correct-answers-content">
+              <CorrectAnswersHistory />
+            </div>
           </CardContent>
         </Card>
       </div>
