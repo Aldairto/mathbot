@@ -1,13 +1,18 @@
-import { NextResponse } from "next/server"
+import type { NextApiRequest, NextApiResponse } from "next"
 import { getServerSession } from "next-auth/next"
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { authOptions } from "../auth/[...nextauth]"
 import prisma from "@/lib/prisma"
 
-export async function GET() {
-  const session = await getServerSession(authOptions)
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const session = await getServerSession(req, res, authOptions)
 
   if (!session?.user?.id) {
-    return NextResponse.json({ message: "Not authenticated" }, { status: 401 })
+    return res.status(401).json({ message: "Not authenticated" })
+  }
+
+  if (req.method !== "GET") {
+    res.setHeader("Allow", ["GET"])
+    return res.status(405).end(`Method ${req.method} Not Allowed`)
   }
 
   try {
@@ -46,12 +51,12 @@ export async function GET() {
       weeklyData[dayOfWeek].duration += record.duration
     })
 
-    return NextResponse.json({
+    return res.status(200).json({
       weeklyData,
     })
   } catch (error) {
     console.error("Error fetching weekly study time:", error)
-    return NextResponse.json({ message: "Error fetching weekly study time" }, { status: 500 })
+    return res.status(500).json({ message: "Error fetching weekly study time" })
   }
 }
 
