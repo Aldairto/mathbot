@@ -6,15 +6,9 @@ import { usePathname, useRouter } from "next/navigation"
 import { signOut, useSession } from "next-auth/react"
 import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
-import { Menu, X, Home, Info, BarChart2, MessageSquare, FileQuestion, Settings, LogOut, LogIn, UserPlus, Sun, Moon, Laptop } from 'lucide-react'
+import { Menu, X, Info, BarChart2, MessageSquare, FileQuestion, Settings, LogOut, LogIn, UserPlus } from 'lucide-react'
 import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "framer-motion"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 
 export function Navbar() {
   const router = useRouter()
@@ -22,7 +16,7 @@ export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { data: session, status } = useSession()
   const [scrolled, setScrolled] = useState(false)
-  const { theme, setTheme } = useTheme()
+  const { theme } = useTheme()
 
   // Detectar scroll para cambiar la apariencia de la barra de navegación
   useEffect(() => {
@@ -60,8 +54,7 @@ export function Navbar() {
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
         scrolled 
           ? "bg-primary/95 backdrop-blur-sm shadow-md" 
-          : "bg-primary",
-        isDarkTheme ? "text-primary-foreground" : "text-primary-foreground"
+          : "bg-primary"
       )}
       aria-label="Navegación principal"
     >
@@ -69,10 +62,7 @@ export function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2 text-xl font-bold">
-            <span className={cn(
-              "p-1 rounded",
-              isDarkTheme ? "bg-white text-primary" : "bg-white text-primary"
-            )}>M</span>
+            <span className="bg-primary-foreground text-primary p-1 rounded">M</span>
             <span className="text-primary-foreground">MathBot</span>
           </Link>
 
@@ -101,14 +91,9 @@ export function Navbar() {
                   Configuración
                 </NavLink>
                 <Button
-                  variant="outline"
+                  variant="secondary"
                   size="sm"
-                  className={cn(
-                    "ml-2 flex items-center gap-1",
-                    isDarkTheme 
-                      ? "bg-white text-primary hover:bg-white/90" 
-                      : "bg-white text-primary hover:bg-white/90"
-                  )}
+                  className="ml-2 flex items-center gap-1"
                   onClick={handleLogout}
                 >
                   <LogOut className="h-4 w-4" />
@@ -121,14 +106,9 @@ export function Navbar() {
                   Iniciar sesión
                 </NavLink>
                 <Button
-                  variant="outline"
+                  variant="secondary"
                   size="sm"
-                  className={cn(
-                    "ml-2 flex items-center gap-1",
-                    isDarkTheme 
-                      ? "bg-white text-primary hover:bg-white/90" 
-                      : "bg-white text-primary hover:bg-white/90"
-                  )}
+                  className="ml-2 flex items-center gap-1"
                   asChild
                 >
                   <Link href="/register">
@@ -138,80 +118,18 @@ export function Navbar() {
                 </Button>
               </>
             )}
-
-            {/* Selector de tema */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  className="ml-1 text-primary-foreground hover:bg-primary-foreground/10"
-                >
-                  {theme === 'light' && <Sun className="h-[1.2rem] w-[1.2rem]" />}
-                  {theme === 'dark' && <Moon className="h-[1.2rem] w-[1.2rem]" />}
-                  {theme === 'system' && <Laptop className="h-[1.2rem] w-[1.2rem]" />}
-                  <span className="sr-only">Cambiar tema</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setTheme("light")}>
-                  <Sun className="mr-2 h-4 w-4" />
-                  <span>Claro</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("dark")}>
-                  <Moon className="mr-2 h-4 w-4" />
-                  <span>Oscuro</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("system")}>
-                  <Laptop className="mr-2 h-4 w-4" />
-                  <span>Sistema</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
 
           {/* Botón de menú móvil */}
-          <div className="md:hidden flex items-center gap-2">
-            {/* Selector de tema móvil */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  className="text-primary-foreground hover:bg-primary-foreground/10"
-                >
-                  {theme === 'light' && <Sun className="h-[1.2rem] w-[1.2rem]" />}
-                  {theme === 'dark' && <Moon className="h-[1.2rem] w-[1.2rem]" />}
-                  {theme === 'system' && <Laptop className="h-[1.2rem] w-[1.2rem]" />}
-                  <span className="sr-only">Cambiar tema</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setTheme("light")}>
-                  <Sun className="mr-2 h-4 w-4" />
-                  <span>Claro</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("dark")}>
-                  <Moon className="mr-2 h-4 w-4" />
-                  <span>Oscuro</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("system")}>
-                  <Laptop className="mr-2 h-4 w-4" />
-                  <span>Sistema</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            
-            <button 
-              className="p-2 rounded-md hover:bg-primary-foreground/10 transition-colors text-primary-foreground"
-              onClick={toggleMenu}
-              aria-expanded={isMenuOpen}
-              aria-controls="mobile-menu"
-              aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
-            >
-              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
+          <button 
+            className="md:hidden p-2 rounded-md hover:bg-primary-foreground/10 transition-colors text-primary-foreground"
+            onClick={toggleMenu}
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-menu"
+            aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
+          >
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
         </div>
       </div>
 
@@ -230,12 +148,7 @@ export function Navbar() {
               initial={{ y: -20 }}
               animate={{ y: 0 }}
               transition={{ staggerChildren: 0.1, delayChildren: 0.1 }}
-              className={cn(
-                "px-2 pt-2 pb-3 space-y-1 sm:px-3 shadow-lg",
-                isDarkTheme 
-                  ? "bg-primary/95 backdrop-blur-sm" 
-                  : "bg-primary/95 backdrop-blur-sm"
-              )}
+              className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-primary/95 backdrop-blur-sm shadow-lg"
             >
               <MobileNavLink href="/about" icon={<Info />} isActive={pathname === '/about'}>
                 Acerca de
@@ -257,13 +170,8 @@ export function Navbar() {
                   </MobileNavLink>
                   <div className="pt-2">
                     <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full flex items-center justify-center gap-2",
-                        isDarkTheme 
-                          ? "bg-white text-primary hover:bg-white/90" 
-                          : "bg-white text-primary hover:bg-white/90"
-                      )}
+                      variant="secondary"
+                      className="w-full flex items-center justify-center gap-2"
                       onClick={handleLogout}
                     >
                       <LogOut className="h-4 w-4" />
@@ -278,13 +186,8 @@ export function Navbar() {
                   </MobileNavLink>
                   <div className="pt-2">
                     <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full flex items-center justify-center gap-2",
-                        isDarkTheme 
-                          ? "bg-white text-primary hover:bg-white/90" 
-                          : "bg-white text-primary hover:bg-white/90"
-                      )}
+                      variant="secondary"
+                      className="w-full flex items-center justify-center gap-2"
                       asChild
                     >
                       <Link href="/register">
@@ -319,7 +222,7 @@ function NavLink({
     <Link 
       href={href} 
       className={cn(
-        "relative flex items-center gap-1 py-2 px-3 rounded-md transition-colors text-primary-foreground",
+        "relative flex items-center gap-1 py-2 px-3 text-primary-foreground rounded-md transition-colors",
         "hover:bg-primary-foreground/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground/50",
         isActive && "bg-primary-foreground/15 font-medium"
       )}
@@ -356,7 +259,7 @@ function MobileNavLink({
       <Link 
         href={href} 
         className={cn(
-          "flex items-center gap-3 py-3 px-4 rounded-md transition-colors text-primary-foreground",
+          "flex items-center gap-3 py-3 px-4 text-primary-foreground rounded-md transition-colors",
           "hover:bg-primary-foreground/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground/50",
           isActive ? "bg-primary-foreground/15 font-medium" : ""
         )}
