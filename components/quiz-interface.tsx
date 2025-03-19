@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Loader2, RefreshCw, CheckCircle2, XCircle } from "lucide-react"
+import { Loader2, RefreshCw, CheckCircle2, XCircle } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
@@ -214,7 +214,7 @@ export function QuizInterface() {
         console.error("No se encontró la respuesta correcta para la pregunta:", questionText)
         return {
           question: questionText,
-          options: lines.slice(1, 5).map((o) => o.replace(/^[A-Da-d]\)\s*([a-d]\))?\s*/, "").trim()),
+          options: lines.slice(1, 5).map((o) => o.replace(/^[A-Da-d][\)\.]?\s*([a-d][\)\.]?)?\s*/, "").trim()),
           correctAnswer: "a", // Valor predeterminado
           userAnswer: "",
           explanation: "",
@@ -224,7 +224,7 @@ export function QuizInterface() {
       // Extraer opciones hasta la línea de respuesta correcta
       const options = lines.slice(1, correctAnswerLineIndex).map((o) => {
         // Eliminar cualquier formato de letra como "A) a)" o "a)" o "A."
-        return o.replace(/^[A-Da-d][).]?\s*([a-d][).]?)?\s*/, "").trim()
+        return o.replace(/^[A-Da-d][\)\.]?\s*([a-d][\)\.]?)?\s*/, "").trim()
       })
 
       // Extraer la respuesta correcta
@@ -321,6 +321,7 @@ export function QuizInterface() {
             correctAnswers: correctQuestions.map((q) => ({
               question: q.question,
               answer: q.options[q.correctAnswer.charCodeAt(0) - 97],
+              explanation: q.explanation || "", // Añadir la explicación
               mainTopic: selectedMainTopic,
               subTopic: selectedSubTopic,
             })),
@@ -485,8 +486,8 @@ export function QuizInterface() {
                       : isSelected
                         ? "text-red-600 dark:text-red-400"
                         : ""
-                    : ""
-                }`}
+                  : ""
+              }`}
               >
                 <div className="flex items-start">
                   <span className="mr-2">{optionLetterUpper})</span>

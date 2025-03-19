@@ -78,6 +78,7 @@ model CorrectAnswer {
   userId    String
   question  String
   answer    String
+  explanation String?  // Campo opcional para la explicación
   mainTopic String
   subTopic  String
   createdAt DateTime @default(now())

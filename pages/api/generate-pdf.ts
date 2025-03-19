@@ -174,7 +174,7 @@ async function processMathExpression(input: string): Promise<string> {
   }
 }
 
-// Mantener la función addAnswerToPDF casi igual
+// Modificar la función addAnswerToPDF para incluir la explicación
 async function addAnswerToPDF(doc: jsPDF, answer: any, yOffset: number): Promise<number> {
   try {
     // Usar una fuente que soporte mejor los símbolos matemáticos
@@ -245,6 +245,23 @@ async function addAnswerToPDF(doc: jsPDF, answer: any, yOffset: number): Promise
       await addText(answerLines[i], xPos, yOffset + i * 6)
     }
     yOffset += answerLines.length * 6 + 4
+
+    // Explanation section (nuevo)
+    if (answer.explanation) {
+      doc.setTextColor(0, 128, 0) // Color verde para la explicación
+      
+      const processedExplanation = await processMathExpression(answer.explanation)
+      
+      await addText("Explicación:", 14, yOffset)
+      const explanationLabelWidth = doc.getTextWidth("Explicación: ")
+      
+      const explanationLines = doc.splitTextToSize(processedExplanation, 180)
+      for (let i = 0; i < explanationLines.length; i++) {
+        const xPos = i === 0 ? 14 + explanationLabelWidth : 14
+        await addText(explanationLines[i], xPos, yOffset + i * 6)
+      }
+      yOffset += explanationLines.length * 6 + 4
+    }
 
     // Date section
     doc.setFontSize(8)

@@ -30,7 +30,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       const savedAnswers = await prisma.correctAnswer.createMany({
         data: correctAnswers.map((answer) => ({
-          ...answer,
+          question: answer.question,
+          answer: answer.answer,
+          explanation: answer.explanation || null, // Manejar explícitamente el campo de explicación
+          mainTopic: answer.mainTopic,
+          subTopic: answer.subTopic,
           userId,
         })),
       })
