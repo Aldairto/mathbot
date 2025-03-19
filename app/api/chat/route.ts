@@ -116,10 +116,21 @@ export async function POST(req: Request) {
       return NextResponse.json({ content: quizContent })
     }
 
-    // Validar mensajes
+    // Validar mensajes - MODIFICADO PARA ACEPTAR TANTO ARRAY COMO OBJETO CON PROPIEDAD MESSAGES
+    if (!messages) {
+      console.log("[API] Error: messages no está definido")
+      throw new Error("messages es requerido")
+    }
+
     if (!Array.isArray(messages)) {
       console.log("[API] Error: messages no es un array")
       throw new Error("messages debe ser un array")
+    }
+
+    // Verificar que el array de mensajes no esté vacío
+    if (messages.length === 0) {
+      console.log("[API] Error: el array de mensajes está vacío")
+      throw new Error("El array de mensajes no puede estar vacío")
     }
 
     // Obtener el último mensaje del usuario
