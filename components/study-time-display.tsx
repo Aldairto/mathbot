@@ -29,6 +29,7 @@ const StudyTimeDisplay = () => {
   const lastSyncTime = useRef(0)
   const accumulatedTime = useRef(0)
   const isActive = useRef(true)
+  const timerStarted = useRef(false)
 
   // Obtener el tiempo de estudio inicial y datos semanales
   useEffect(() => {
@@ -52,6 +53,9 @@ const StudyTimeDisplay = () => {
   // Configurar intervalos para actualizar UI y sincronizar con API
   useEffect(() => {
     if (status !== "authenticated") return
+
+    // Marcar que el temporizador ha comenzado
+    timerStarted.current = true
 
     // Actualizar UI cada 15 segundos
     const uiTimer = setInterval(() => {

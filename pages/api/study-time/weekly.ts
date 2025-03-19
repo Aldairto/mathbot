@@ -26,13 +26,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const weeklyStudyTimes = await prisma.studyTime.findMany({
       where: {
         userId: session.user.id,
-        createdAt: {
+        date: {
+          // Cambiado de createdAt a date
           gte: startOfWeek,
         },
       },
       select: {
         duration: true,
-        createdAt: true,
+        date: true, // Cambiado de createdAt a date
       },
     })
 
@@ -47,7 +48,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Sumar las duraciones por día
     weeklyStudyTimes.forEach((record) => {
-      const dayOfWeek = record.createdAt.getDay() // 0 = Domingo, 1 = Lunes, etc.
+      const dayOfWeek = record.date.getDay() // 0 = Domingo, 1 = Lunes, etc.
       weeklyData[dayOfWeek].duration += record.duration
     })
 
