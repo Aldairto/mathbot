@@ -208,16 +208,7 @@ export default function DashboardPage() {
             <RefreshCw className="mr-2 h-4 w-4" />
             Actualizar
           </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleExportData}
-            disabled={!quizResults.length}
-            className="flex items-center"
-          >
-            <Download className="mr-2 h-4 w-4" />
-            Exportar datos
-          </Button>
+         
         </div>
       </div>
 
