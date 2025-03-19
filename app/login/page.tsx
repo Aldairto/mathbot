@@ -73,12 +73,7 @@ export default function LoginPage() {
           <LoginFormWrapper />
         </CardContent>
         <CardFooter className="flex flex-col space-y-4 pt-0">
-          <div className="text-sm text-center">
-            ¿Olvidaste tu contraseña?{" "}
-            <Link href="/forgot-password" className="text-primary hover:underline">
-              Recuperar acceso
-            </Link>
-          </div>
+          
           <div className="text-sm text-center">
             ¿No tienes una cuenta?{" "}
             <Link href="/register" className="text-primary hover:underline">
