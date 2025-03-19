@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Loader2, RefreshCw, CheckCircle2, XCircle } from 'lucide-react'
+import { Loader2, RefreshCw, CheckCircle2, XCircle, Info } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
@@ -60,10 +60,11 @@ export function QuizInterface() {
   const [refreshKey, setRefreshKey] = useState(0)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [viewMode, setViewMode] = useState<"all" | "one-by-one">("all")
+  const [isLoadingExplanations, setIsLoadingExplanations] = useState(false)
 
   const loadQuizState = useCallback(async () => {
-    if (!session?.user?.id) return;
-    
+    if (!session?.user?.id) return
+
     try {
       // Primero, intentamos cargar desde localStorage
       const localState = localStorage.getItem(`quizState_${session.user.id}`)
@@ -94,7 +95,7 @@ export function QuizInterface() {
           setAttemptCount(serverState.attemptCount)
           setCurrentQuestionIndex(serverState.currentQuestionIndex || 0)
           setViewMode(serverState.viewMode || "all")
-          
+
           // Actualizamos localStorage con el estado más reciente
           localStorage.setItem(
             `quizState_${session.user.id}`,
@@ -111,8 +112,8 @@ export function QuizInterface() {
   }, [session?.user?.id])
 
   const saveQuizState = useCallback(async () => {
-    if (!session?.user?.id || !quiz) return;
-    
+    if (!session?.user?.id || !quiz) return
+
     try {
       const state = {
         quiz,
@@ -124,7 +125,7 @@ export function QuizInterface() {
         viewMode,
         updatedAt: new Date().toISOString(),
       }
-      
+
       // Guardamos en localStorage
       localStorage.setItem(`quizState_${session.user.id}`, JSON.stringify(state))
 
@@ -138,14 +139,14 @@ export function QuizInterface() {
       console.error("Error al guardar el estado en el servidor:", error)
     }
   }, [
-    session?.user?.id, 
-    quiz, 
-    selectedMainTopic, 
-    selectedSubTopic, 
-    showResults, 
-    attemptCount, 
-    currentQuestionIndex, 
-    viewMode
+    session?.user?.id,
+    quiz,
+    selectedMainTopic,
+    selectedSubTopic,
+    showResults,
+    attemptCount,
+    currentQuestionIndex,
+    viewMode,
   ])
 
   useEffect(() => {
@@ -178,6 +179,7 @@ export function QuizInterface() {
           generateQuiz: true,
           mainTopic: selectedMainTopic,
           subTopic: selectedSubTopic,
+          includeExplanations: true, // Solicitar explícitamente explicaciones
         }),
       })
 
@@ -203,26 +205,42 @@ export function QuizInterface() {
     return questions.map((q) => {
       const lines = q.split("\n").filter((line) => line.trim() !== "")
       const questionText = lines[0].trim()
-      
+
       // Buscar la línea que contiene "Respuesta correcta:"
-      const correctAnswerLineIndex = lines.findIndex(line => 
-        line.toLowerCase().includes("respuesta correcta:"))
-      
+      const correctAnswerLineIndex = lines.findIndex((line) => line.toLowerCase().includes("respuesta correcta:"))
+
       // Extraer opciones hasta la línea de respuesta correcta
-      const options = lines.slice(1, correctAnswerLineIndex).map((o) => 
-        o.replace(/^[a-d]\)\s*/, "").trim())
-      
+      const options = lines.slice(1, correctAnswerLineIndex).map((o) => o.replace(/^[a-d]\)\s*/, "").trim())
+
       // Extraer la respuesta correcta
       const correctAnswerLine = lines[correctAnswerLineIndex]
       const correctAnswer = correctAnswerLine
         .replace(/respuesta correcta:\s*/i, "")
         .trim()
         .toLowerCase()
-      
+
       // Buscar explicación si existe (después de la respuesta correcta)
       let explanation = ""
       if (correctAnswerLineIndex < lines.length - 1) {
-        explanation = lines.slice(correctAnswerLineIndex + 1).join("\n")
+        // Buscar específicamente una línea que comience con "Explicación:" o extraer todo lo que sigue
+        const explanationLineIndex = lines.findIndex(
+          (line, idx) => idx > correctAnswerLineIndex && line.toLowerCase().includes("explicación:"),
+        )
+
+        if (explanationLineIndex !== -1) {
+          // Si hay una línea específica de "Explicación:", tomar desde ahí
+          explanation = lines
+            .slice(explanationLineIndex)
+            .join("\n")
+            .replace(/^explicación:\s*/i, "")
+            .trim()
+        } else {
+          // Si no, tomar todo lo que sigue después de la respuesta correcta
+          explanation = lines
+            .slice(correctAnswerLineIndex + 1)
+            .join("\n")
+            .trim()
+        }
       }
 
       return {
@@ -230,7 +248,7 @@ export function QuizInterface() {
         options,
         correctAnswer: correctAnswer.length === 1 ? correctAnswer : "a", // Fallback to 'a' if not a single letter
         userAnswer: "",
-        explanation
+        explanation,
       }
     })
   }
@@ -254,6 +272,9 @@ export function QuizInterface() {
           mainTopic: selectedMainTopic,
           subTopic: selectedSubTopic,
           correct: isCorrect,
+          question: currentQuestion.question,
+          userAnswer: currentQuestion.options[answer.charCodeAt(0) - 97],
+          correctAnswer: currentQuestion.options[currentQuestion.correctAnswer.charCodeAt(0) - 97],
         }),
       })
     } catch (error) {
@@ -262,11 +283,13 @@ export function QuizInterface() {
   }
 
   const handleSubmitQuiz = async () => {
-    if (!quiz) return;
-    
+    if (!quiz) return
+
     setShowResults(true)
-    const correctQuestions = quiz.filter((q) => 
-      q.correctAnswer.toLowerCase() === q.userAnswer?.toLowerCase())
+    const correctQuestions = quiz.filter((q) => q.correctAnswer.toLowerCase() === q.userAnswer?.toLowerCase())
+
+    // Generar explicaciones para preguntas que no las tienen
+    await generateMissingExplanations()
 
     if (correctQuestions.length > 0) {
       try {
@@ -290,6 +313,58 @@ export function QuizInterface() {
     }
   }
 
+  // Función para generar explicaciones para preguntas que no las tienen
+  const generateMissingExplanations = async () => {
+    if (!quiz) return
+
+    const questionsWithoutExplanations = quiz.filter((q) => !q.explanation || q.explanation.trim() === "")
+
+    if (questionsWithoutExplanations.length === 0) return
+
+    setIsLoadingExplanations(true)
+
+    try {
+      const updatedQuiz = [...quiz]
+
+      for (let i = 0; i < questionsWithoutExplanations.length; i++) {
+        const questionIndex = quiz.findIndex((q) => q === questionsWithoutExplanations[i])
+        if (questionIndex === -1) continue
+
+        const question = quiz[questionIndex]
+        const correctOptionText = question.options[question.correctAnswer.charCodeAt(0) - 97]
+
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            generateExplanation: true,
+            question: question.question,
+            options: question.options,
+            correctAnswer: correctOptionText,
+            mainTopic: selectedMainTopic,
+            subTopic: selectedSubTopic,
+          }),
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          updatedQuiz[questionIndex] = {
+            ...updatedQuiz[questionIndex],
+            explanation: data.content.trim(),
+          }
+        }
+      }
+
+      setQuiz(updatedQuiz)
+    } catch (error) {
+      console.error("Error al generar explicaciones:", error)
+    } finally {
+      setIsLoadingExplanations(false)
+    }
+  }
+
   const handleRetakeQuiz = () => {
     setShowResults(false)
     setAttemptCount((prevCount) => prevCount + 1)
@@ -305,8 +380,8 @@ export function QuizInterface() {
   }
 
   const renderMathExpression = (text: string) => {
-    if (!text) return null;
-    
+    if (!text) return null
+
     const parts = text.split(/(\$\$.*?\$\$|\$.*?\$)/gs)
     return parts.map((part, index) => {
       if (part.startsWith("$$") && part.endsWith("$$")) {
@@ -320,7 +395,7 @@ export function QuizInterface() {
   }
 
   const handleNextQuestion = () => {
-    if (!quiz) return;
+    if (!quiz) return
     if (currentQuestionIndex < quiz.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1)
     }
@@ -337,8 +412,8 @@ export function QuizInterface() {
   }
 
   const getAnsweredQuestionsCount = () => {
-    if (!quiz) return 0;
-    return quiz.filter(q => q.userAnswer).length;
+    if (!quiz) return 0
+    return quiz.filter((q) => q.userAnswer).length
   }
 
   useEffect(() => {
@@ -366,11 +441,11 @@ export function QuizInterface() {
             <div
               key={`${optionIndex}-${refreshKey}`}
               className={`flex items-start space-x-2 p-2 rounded-md ${
-                showResults 
-                  ? isCorrect 
-                    ? "bg-green-100 dark:bg-green-900/20" 
-                    : isSelected 
-                      ? "bg-red-100 dark:bg-red-900/20" 
+                showResults
+                  ? isCorrect
+                    ? "bg-green-100 dark:bg-green-900/20"
+                    : isSelected
+                      ? "bg-red-100 dark:bg-red-900/20"
                       : "hover:bg-accent"
                   : "hover:bg-accent"
               }`}
@@ -391,18 +466,42 @@ export function QuizInterface() {
                 <div className="flex items-start">
                   <span className="mr-2">{optionLetter.toUpperCase()})</span>
                   <div className="flex-1">{renderMathExpression(option)}</div>
-                  {showResults && isCorrect && <CheckCircle2 className="text-green-600 dark:text-green-400 ml-2 h-5 w-5 flex-shrink-0" />}
-                  {showResults && !isCorrect && isSelected && <XCircle className="text-red-600 dark:text-red-400 ml-2 h-5 w-5 flex-shrink-0" />}
+                  {showResults && isCorrect && (
+                    <CheckCircle2 className="text-green-600 dark:text-green-400 ml-2 h-5 w-5 flex-shrink-0" />
+                  )}
+                  {showResults && !isCorrect && isSelected && (
+                    <XCircle className="text-red-600 dark:text-red-400 ml-2 h-5 w-5 flex-shrink-0" />
+                  )}
                 </div>
               </Label>
             </div>
           )
         })}
       </RadioGroup>
-      {showResults && question.explanation && (
-        <div className="mt-4 p-3 bg-blue-100 dark:bg-blue-900/20 rounded-md">
-          <h4 className="font-semibold text-blue-800 dark:text-blue-300">Explicación:</h4>
-          <div className="text-blue-700 dark:text-blue-200">{renderMathExpression(question.explanation)}</div>
+      {showResults && (
+        <div className="mt-4">
+          {isLoadingExplanations && !question.explanation ? (
+            <div className="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-md flex items-center">
+              <Loader2 className="h-4 w-4 mr-2 animate-spin text-blue-600 dark:text-blue-400" />
+              <span className="text-blue-700 dark:text-blue-200">Generando explicación...</span>
+            </div>
+          ) : question.explanation ? (
+            <div className="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-md">
+              <h4 className="font-semibold text-blue-800 dark:text-blue-300 flex items-center">
+                <Info className="h-4 w-4 mr-1" /> Explicación:
+              </h4>
+              <div className="text-blue-700 dark:text-blue-200 mt-1">{renderMathExpression(question.explanation)}</div>
+            </div>
+          ) : (
+            <div className="p-3 bg-amber-100 dark:bg-amber-900/20 rounded-md">
+              <h4 className="font-semibold text-amber-800 dark:text-amber-300 flex items-center">
+                <Info className="h-4 w-4 mr-1" /> Respuesta correcta:
+              </h4>
+              <div className="text-amber-700 dark:text-amber-200 mt-1">
+                La respuesta correcta es la opción {question.correctAnswer.toUpperCase()}.
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -457,7 +556,7 @@ export function QuizInterface() {
           )}
         </div>
       </div>
-      
+
       {quiz && (
         <div className="px-4 py-2 bg-muted/10 border-t border-b">
           <div className="flex justify-between items-center">
@@ -470,13 +569,10 @@ export function QuizInterface() {
               </div>
             )}
           </div>
-          <Progress 
-            value={(getAnsweredQuestionsCount() / quiz.length) * 100} 
-            className="h-2 mt-1" 
-          />
+          <Progress value={(getAnsweredQuestionsCount() / quiz.length) * 100} className="h-2 mt-1" />
         </div>
       )}
-      
+
       <ScrollArea className="flex-grow p-4">
         {error && (
           <Alert variant="destructive" className="mb-4">
@@ -484,7 +580,7 @@ export function QuizInterface() {
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
-        
+
         {quiz && (
           <Card className="mb-4" key={refreshKey}>
             <CardHeader>
@@ -492,34 +588,26 @@ export function QuizInterface() {
                 Cuestionario: {selectedMainTopic} - {selectedSubTopic}
               </CardTitle>
               <CardDescription>
-                {showResults 
-                  ? "Revisa tus respuestas y la retroalimentación:" 
-                  : "Responde a las siguientes preguntas:"}
+                {showResults ? "Revisa tus respuestas y la retroalimentación:" : "Responde a las siguientes preguntas:"}
               </CardDescription>
             </CardHeader>
-            
+
             <CardContent>
-              {viewMode === "all" ? (
-                // Mostrar todas las preguntas
-                quiz.map((question, index) => renderQuestion(question, index))
-              ) : (
-                // Mostrar una pregunta a la vez
-                quiz[currentQuestionIndex] && renderQuestion(quiz[currentQuestionIndex], currentQuestionIndex)
-              )}
+              {viewMode === "all"
+                ? // Mostrar todas las preguntas
+                  quiz.map((question, index) => renderQuestion(question, index))
+                : // Mostrar una pregunta a la vez
+                  quiz[currentQuestionIndex] && renderQuestion(quiz[currentQuestionIndex], currentQuestionIndex)}
             </CardContent>
-            
+
             <CardFooter className="flex flex-col sm:flex-row gap-4">
               {viewMode === "one-by-one" && (
                 <div className="flex gap-2 w-full sm:w-auto">
-                  <Button 
-                    variant="outline" 
-                    onClick={handlePrevQuestion}
-                    disabled={currentQuestionIndex === 0}
-                  >
+                  <Button variant="outline" onClick={handlePrevQuestion} disabled={currentQuestionIndex === 0}>
                     Anterior
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={handleNextQuestion}
                     disabled={currentQuestionIndex === quiz.length - 1}
                   >
@@ -527,15 +615,15 @@ export function QuizInterface() {
                   </Button>
                 </div>
               )}
-              
+
               {!showResults ? (
-                <Button 
-                  onClick={handleSubmitQuiz} 
+                <Button
+                  onClick={handleSubmitQuiz}
                   className="w-full sm:w-auto"
                   disabled={getAnsweredQuestionsCount() < quiz.length}
                 >
-                  {getAnsweredQuestionsCount() < quiz.length 
-                    ? `Faltan ${quiz.length - getAnsweredQuestionsCount()} respuestas` 
+                  {getAnsweredQuestionsCount() < quiz.length
+                    ? `Faltan ${quiz.length - getAnsweredQuestionsCount()} respuestas`
                     : "Enviar respuestas"}
                 </Button>
               ) : (
@@ -559,3 +647,4 @@ export function QuizInterface() {
     </div>
   )
 }
+
