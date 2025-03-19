@@ -61,7 +61,7 @@ export function Navbar() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2 text-xl font-bold">
+          <Link href="/about" className="flex items-center space-x-2 text-xl font-bold">
             <span className="bg-primary-foreground text-primary p-1 rounded">M</span>
             <span className="text-primary-foreground">MathBot</span>
           </Link>
