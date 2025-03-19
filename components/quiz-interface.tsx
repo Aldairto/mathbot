@@ -184,19 +184,7 @@ export function QuizInterface() {
             },
             {
               role: "user",
-              content: `Genera un cuestionario de 5 preguntas sobre ${selectedMainTopic} - ${selectedSubTopic}. 
-              Cada pregunta debe tener 4 opciones y debe incluir la respuesta correcta y una explicación detallada de por qué es correcta.
-              
-              Formato para cada pregunta:
-              [Pregunta]
-              A) [Opción A]
-              B) [Opción B]
-              C) [Opción C]
-              D) [Opción D]
-              
-              Respuesta correcta: [letra]
-              
-              Explicación: [explicación detallada]`,
+              content: `Genera un cuestionario de 5 preguntas sobre ${selectedMainTopic} - ${selectedSubTopic}. Cada pregunta debe tener 4 opciones (a, b, c, d) y debe incluir la respuesta correcta y una explicación detallada de por qué es correcta.`,
             },
           ],
         }),
@@ -232,7 +220,7 @@ export function QuizInterface() {
         console.error("No se encontró la respuesta correcta para la pregunta:", questionText)
         return {
           question: questionText,
-          options: lines.slice(1, 5).map((o) => o.replace(/^[A-Da-d]\)\s*([a-d]\))?\s*/, "").trim()),
+          options: lines.slice(1, 5).map((o) => o.replace(/^[a-d]\)\s*/, "").trim()),
           correctAnswer: "a", // Valor predeterminado
           userAnswer: "",
           explanation: "",
@@ -240,14 +228,11 @@ export function QuizInterface() {
       }
 
       // Extraer opciones hasta la línea de respuesta correcta
-      const options = lines.slice(1, correctAnswerLineIndex).map((o) => {
-        // Eliminar cualquier formato de letra duplicada como "A) a)" o similar
-        return o.replace(/^[A-Da-d]\)\s*([a-d]\))?\s*/, "").trim()
-      })
+      const options = lines.slice(1, correctAnswerLineIndex).map((o) => o.replace(/^[a-d]\)\s*/, "").trim())
 
       // Extraer la respuesta correcta
       const correctAnswerLine = lines[correctAnswerLineIndex]
-      const correctAnswerMatch = correctAnswerLine.match(/respuesta correcta:\s*([A-Da-d])/i)
+      const correctAnswerMatch = correctAnswerLine.match(/respuesta correcta:\s*([a-d])/i)
       const correctAnswer = correctAnswerMatch
         ? correctAnswerMatch[1].toLowerCase()
         : correctAnswerLine
@@ -258,25 +243,30 @@ export function QuizInterface() {
       // Buscar explicación después de la respuesta correcta
       let explanation = ""
 
-      // Buscar la línea que comienza con "Explicación:"
-      const explanationLineIndex = lines.findIndex(
-        (line, idx) => idx > correctAnswerLineIndex && line.toLowerCase().includes("explicación:"),
-      )
+      // Primero, buscar una línea que comience con "Explicación:" o similar
+      for (let i = correctAnswerLineIndex + 1; i < lines.length; i++) {
+        if (
+          lines[i].toLowerCase().includes("explicación:") ||
+          lines[i].toLowerCase().includes("explicacion:") ||
+          lines[i].toLowerCase().includes("porque:") ||
+          lines[i].toLowerCase().includes("porque ") ||
+          lines[i].toLowerCase().includes("ya que ")
+        ) {
+          // Encontramos una línea de explicación, tomamos desde aquí hasta el final
+          explanation = lines
+            .slice(i)
+            .join("\n")
+            .replace(/^(explicación|explicacion|porque):\s*/i, "")
+            .trim()
+          break
+        }
+      }
 
-      if (explanationLineIndex !== -1) {
-        // Eliminar el prefijo "Explicación:" y cualquier duplicado
-        explanation = lines
-          .slice(explanationLineIndex)
-          .join("\n")
-          .replace(/^explicación:\s*(explicación:)?\s*/i, "")
-          .trim()
-      } else if (correctAnswerLineIndex < lines.length - 1) {
-        // Si no hay una línea específica, tomar todo lo que sigue después de la respuesta correcta
+      // Si no encontramos una línea específica, tomamos todo lo que sigue después de la respuesta correcta
+      if (!explanation && correctAnswerLineIndex < lines.length - 1) {
         explanation = lines
           .slice(correctAnswerLineIndex + 1)
           .join("\n")
-          .trim()
-          .replace(/^explicación:\s*(explicación:)?\s*/i, "")
           .trim()
       }
 
@@ -383,7 +373,7 @@ export function QuizInterface() {
               },
               {
                 role: "user",
-                content: `Explica por qué la respuesta correcta a esta pregunta es "${correctOptionText}". La pregunta es: "${question.question}". Las opciones son: ${question.options.map((opt, idx) => `${String.fromCharCode(65 + idx)}) ${opt}`).join(", ")}.`,
+                content: `Explica por qué la respuesta correcta a esta pregunta es "${correctOptionText}". La pregunta es: "${question.question}". Las opciones son: ${question.options.map((opt, idx) => `${String.fromCharCode(97 + idx)}) ${opt}`).join(", ")}.`,
               },
             ],
           }),
@@ -476,7 +466,6 @@ export function QuizInterface() {
       >
         {question.options.map((option, optionIndex) => {
           const optionLetter = String.fromCharCode(97 + optionIndex)
-          const optionLetterUpper = String.fromCharCode(65 + optionIndex)
           const isCorrect = optionLetter === question.correctAnswer
           const isSelected = question.userAnswer === optionLetter
           return (
@@ -506,7 +495,7 @@ export function QuizInterface() {
                 }`}
               >
                 <div className="flex items-start">
-                  <span className="mr-2">{optionLetterUpper})</span>
+                  <span className="mr-2">{optionLetter.toUpperCase()})</span>
                   <div className="flex-1">{renderMathExpression(option)}</div>
                   {showResults && isCorrect && (
                     <CheckCircle2 className="text-green-600 dark:text-green-400 ml-2 h-5 w-5 flex-shrink-0" />
