@@ -176,10 +176,17 @@ export function QuizInterface() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          generateQuiz: true,
-          mainTopic: selectedMainTopic,
-          subTopic: selectedSubTopic,
-          includeExplanations: true, // Solicitar explícitamente explicaciones
+          messages: [
+            {
+              role: "system",
+              content:
+                "Eres un asistente especializado en generar cuestionarios educativos con explicaciones detalladas.",
+            },
+            {
+              role: "user",
+              content: `Genera un cuestionario de 5 preguntas sobre ${selectedMainTopic} - ${selectedSubTopic}. Cada pregunta debe tener 4 opciones (a, b, c, d) y debe incluir la respuesta correcta y una explicación detallada de por qué es correcta.`,
+            },
+          ],
         }),
       })
 
@@ -359,12 +366,16 @@ export function QuizInterface() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            generateExplanation: true,
-            question: question.question,
-            options: question.options,
-            correctAnswer: correctOptionText,
-            mainTopic: selectedMainTopic,
-            subTopic: selectedSubTopic,
+            messages: [
+              {
+                role: "system",
+                content: "Eres un asistente especializado en explicar conceptos matemáticos de manera clara y concisa.",
+              },
+              {
+                role: "user",
+                content: `Explica por qué la respuesta correcta a esta pregunta es "${correctOptionText}". La pregunta es: "${question.question}". Las opciones son: ${question.options.map((opt, idx) => `${String.fromCharCode(97 + idx)}) ${opt}`).join(", ")}.`,
+              },
+            ],
           }),
         })
 
@@ -502,9 +513,16 @@ export function QuizInterface() {
         <div className="mt-4 p-3 bg-blue-100 dark:bg-blue-900/20 rounded-md">
           <h4 className="font-semibold text-blue-800 dark:text-blue-300">Explicación:</h4>
           <div className="text-blue-700 dark:text-blue-200">
-            {question.explanation
-              ? renderMathExpression(question.explanation)
-              : `La respuesta correcta es la opción ${question.correctAnswer.toUpperCase()}.`}
+            {isLoadingExplanations && !question.explanation ? (
+              <div className="flex items-center">
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                <span>Generando explicación...</span>
+              </div>
+            ) : question.explanation ? (
+              renderMathExpression(question.explanation)
+            ) : (
+              `La respuesta correcta es la opción ${question.correctAnswer.toUpperCase()}.`
+            )}
           </div>
         </div>
       )}
