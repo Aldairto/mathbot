@@ -105,31 +105,7 @@ export async function POST(req: Request) {
       generateQuiz: !!body.generateQuiz,
     })
 
-    // Extraer los mensajes del cuerpo de la solicitud
-    // MODIFICACIÓN: Aceptar tanto un array directo como un objeto con propiedad messages
-    let messages
-    let generateQuiz = false
-    let mainTopic = ""
-    let subTopic = ""
-    let includeCorrectAnswer = false
-
-    // Verificar si body es un objeto con propiedad messages o un array directamente
-    if (body.messages) {
-      // Es un objeto con propiedad messages
-      messages = body.messages
-      generateQuiz = body.generateQuiz || false
-      mainTopic = body.mainTopic || ""
-      subTopic = body.subTopic || ""
-      includeCorrectAnswer = body.includeCorrectAnswer || false
-    } else if (Array.isArray(body)) {
-      // Es un array directamente
-      messages = body
-    } else {
-      // No es ninguno de los formatos esperados
-      console.log("[API] Error: No se encontraron mensajes en el formato esperado")
-      return NextResponse.json({ error: "Formato de solicitud inválido" }, { status: 400 })
-    }
-
+    const { messages, generateQuiz, mainTopic, subTopic, includeCorrectAnswer } = body
     const userId = (session as any)?.user?.id || "anonymous"
 
     // Manejar generación de cuestionarios
@@ -143,12 +119,7 @@ export async function POST(req: Request) {
     // Validar mensajes
     if (!Array.isArray(messages)) {
       console.log("[API] Error: messages no es un array")
-      return NextResponse.json({ error: "messages debe ser un array" }, { status: 400 })
-    }
-
-    if (messages.length === 0) {
-      console.log("[API] Error: El array de mensajes está vacío")
-      return NextResponse.json({ error: "El array de mensajes no puede estar vacío" }, { status: 400 })
+      throw new Error("messages debe ser un array")
     }
 
     // Obtener el último mensaje del usuario
