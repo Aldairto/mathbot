@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Loader2, RefreshCw, CheckCircle2, XCircle } from "lucide-react"
+import { Loader2, RefreshCw, CheckCircle2, XCircle, Info } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
@@ -209,58 +209,38 @@ export function QuizInterface() {
       // Buscar la línea que contiene "Respuesta correcta:"
       const correctAnswerLineIndex = lines.findIndex((line) => line.toLowerCase().includes("respuesta correcta:"))
 
-      if (correctAnswerLineIndex === -1) {
-        console.error("No se encontró la respuesta correcta para la pregunta:", questionText)
-        return {
-          question: questionText,
-          options: lines.slice(1, 5).map((o) => o.replace(/^[a-d]\)\s*/, "").trim()),
-          correctAnswer: "a", // Valor predeterminado
-          userAnswer: "",
-          explanation: "",
-        }
-      }
-
       // Extraer opciones hasta la línea de respuesta correcta
       const options = lines.slice(1, correctAnswerLineIndex).map((o) => o.replace(/^[a-d]\)\s*/, "").trim())
 
       // Extraer la respuesta correcta
       const correctAnswerLine = lines[correctAnswerLineIndex]
-      const correctAnswerMatch = correctAnswerLine.match(/respuesta correcta:\s*([a-d])/i)
-      const correctAnswer = correctAnswerMatch
-        ? correctAnswerMatch[1].toLowerCase()
-        : correctAnswerLine
-            .replace(/respuesta correcta:\s*/i, "")
-            .trim()
-            .toLowerCase()
+      const correctAnswer = correctAnswerLine
+        .replace(/respuesta correcta:\s*/i, "")
+        .trim()
+        .toLowerCase()
 
-      // Buscar explicación después de la respuesta correcta
+      // Buscar explicación si existe (después de la respuesta correcta)
       let explanation = ""
+      if (correctAnswerLineIndex < lines.length - 1) {
+        // Buscar específicamente una línea que comience con "Explicación:" o extraer todo lo que sigue
+        const explanationLineIndex = lines.findIndex(
+          (line, idx) => idx > correctAnswerLineIndex && line.toLowerCase().includes("explicación:"),
+        )
 
-      // Primero, buscar una línea que comience con "Explicación:" o similar
-      for (let i = correctAnswerLineIndex + 1; i < lines.length; i++) {
-        if (
-          lines[i].toLowerCase().includes("explicación:") ||
-          lines[i].toLowerCase().includes("explicacion:") ||
-          lines[i].toLowerCase().includes("porque:") ||
-          lines[i].toLowerCase().includes("porque ") ||
-          lines[i].toLowerCase().includes("ya que ")
-        ) {
-          // Encontramos una línea de explicación, tomamos desde aquí hasta el final
+        if (explanationLineIndex !== -1) {
+          // Si hay una línea específica de "Explicación:", tomar desde ahí
           explanation = lines
-            .slice(i)
+            .slice(explanationLineIndex)
             .join("\n")
-            .replace(/^(explicación|explicacion|porque):\s*/i, "")
+            .replace(/^explicación:\s*/i, "")
             .trim()
-          break
+        } else {
+          // Si no, tomar todo lo que sigue después de la respuesta correcta
+          explanation = lines
+            .slice(correctAnswerLineIndex + 1)
+            .join("\n")
+            .trim()
         }
-      }
-
-      // Si no encontramos una línea específica, tomamos todo lo que sigue después de la respuesta correcta
-      if (!explanation && correctAnswerLineIndex < lines.length - 1) {
-        explanation = lines
-          .slice(correctAnswerLineIndex + 1)
-          .join("\n")
-          .trim()
       }
 
       return {
@@ -499,13 +479,29 @@ export function QuizInterface() {
         })}
       </RadioGroup>
       {showResults && (
-        <div className="mt-4 p-3 bg-blue-100 dark:bg-blue-900/20 rounded-md">
-          <h4 className="font-semibold text-blue-800 dark:text-blue-300">Explicación:</h4>
-          <div className="text-blue-700 dark:text-blue-200">
-            {question.explanation
-              ? renderMathExpression(question.explanation)
-              : `La respuesta correcta es la opción ${question.correctAnswer.toUpperCase()}.`}
-          </div>
+        <div className="mt-4">
+          {isLoadingExplanations && !question.explanation ? (
+            <div className="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-md flex items-center">
+              <Loader2 className="h-4 w-4 mr-2 animate-spin text-blue-600 dark:text-blue-400" />
+              <span className="text-blue-700 dark:text-blue-200">Generando explicación...</span>
+            </div>
+          ) : question.explanation ? (
+            <div className="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-md">
+              <h4 className="font-semibold text-blue-800 dark:text-blue-300 flex items-center">
+                <Info className="h-4 w-4 mr-1" /> Explicación:
+              </h4>
+              <div className="text-blue-700 dark:text-blue-200 mt-1">{renderMathExpression(question.explanation)}</div>
+            </div>
+          ) : (
+            <div className="p-3 bg-amber-100 dark:bg-amber-900/20 rounded-md">
+              <h4 className="font-semibold text-amber-800 dark:text-amber-300 flex items-center">
+                <Info className="h-4 w-4 mr-1" /> Respuesta correcta:
+              </h4>
+              <div className="text-amber-700 dark:text-amber-200 mt-1">
+                La respuesta correcta es la opción {question.correctAnswer.toUpperCase()}.
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
