@@ -200,6 +200,7 @@ export function QuizInterface() {
     }
   }
 
+  // Mejorar la función parseQuizContent para manejar mejor el formato de las opciones
   const parseQuizContent = (content: string): Question[] => {
     const questions = content.split(/\d+\.\s/).filter((q) => q.trim() !== "")
     return questions.map((q) => {
@@ -222,13 +223,13 @@ export function QuizInterface() {
 
       // Extraer opciones hasta la línea de respuesta correcta
       const options = lines.slice(1, correctAnswerLineIndex).map((o) => {
-        // Eliminar cualquier formato de letra duplicada como "A) a)" o similar
-        return o.replace(/^[A-Da-d]\)\s*([a-d]\))?\s*/, "").trim()
+        // Eliminar cualquier formato de letra como "A) a)" o "a)" o "A."
+        return o.replace(/^[A-Da-d][).]?\s*([a-d][).]?)?\s*/, "").trim()
       })
 
       // Extraer la respuesta correcta
       const correctAnswerLine = lines[correctAnswerLineIndex]
-      const correctAnswerMatch = correctAnswerLine.match(/respuesta correcta:\s*([A-Da-d])/i)
+      const correctAnswerMatch = correctAnswerLine.match(/respuesta correcta:\s*([a-d])/i)
       const correctAnswer = correctAnswerMatch
         ? correctAnswerMatch[1].toLowerCase()
         : correctAnswerLine
@@ -444,6 +445,7 @@ export function QuizInterface() {
     }
   }, [quiz])
 
+  // Mejorar el renderizado de las opciones para evitar duplicación de letras
   const renderQuestion = (question: Question, index: number) => (
     <div key={`${index}-${refreshKey}`} className="mb-8 p-4 bg-secondary/30 rounded-lg">
       <h3 className="text-lg font-semibold mb-4">

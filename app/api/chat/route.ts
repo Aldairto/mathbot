@@ -236,7 +236,7 @@ export async function POST(req: Request) {
   }
 }
 
-// Función para generar cuestionarios
+// Modificar la función generateQuestionnaire para especificar un formato más claro
 async function generateQuestionnaire(
   mainTopic: string,
   subTopic: string,
@@ -244,27 +244,28 @@ async function generateQuestionnaire(
 ): Promise<string> {
   const prompt = `
   Genera un cuestionario de 5 preguntas sobre ${mainTopic} - ${subTopic}.
-  Cada pregunta debe tener EXACTAMENTE 4 opciones de respuesta (a, b, c, d).
+  Cada pregunta debe tener EXACTAMENTE 4 opciones de respuesta.
 
   FORMATO EXACTO (respeta este formato):
   1. [Pregunta]
-  [Opción a]
-  [Opción b]
-  [Opción c]
-  [Opción d]
+  a) [Opción a]
+  b) [Opción b]
+  c) [Opción c]
+  d) [Opción d]
   Respuesta correcta: [letra]
 
   2. [Pregunta]
-  [Opción a]
-  [Opción b]
-  [Opción c]
-  [Opción d]
+  a) [Opción a]
+  b) [Opción b]
+  c) [Opción c]
+  d) [Opción d]
   Respuesta correcta: [letra]
 
   Y así sucesivamente...
 
   IMPORTANTE:
   - Cada pregunta DEBE tener exactamente 4 opciones, ni más ni menos.
+  - Las opciones DEBEN estar etiquetadas SOLO como a), b), c), d) - NO uses A), B), C), D) ni ningún otro formato.
   - La respuesta correcta DEBE ser SOLO la letra (a, b, c o d).
   - DISTRIBUYE ALEATORIAMENTE la respuesta correcta entre las cuatro opciones. NO coloques siempre la respuesta correcta en la opción "a".
   - Para cada pregunta, elige una letra diferente como respuesta correcta si es posible.
@@ -280,7 +281,7 @@ async function generateQuestionnaire(
       {
         role: "system",
         content:
-          "Eres un experto en matemáticas que genera cuestionarios educativos con fórmulas LaTeX. IMPORTANTE: Distribuye aleatoriamente las respuestas correctas entre las opciones a, b, c y d. No coloques siempre la respuesta correcta en la misma opción. SIEMPRE deja un espacio antes y después de cada expresión matemática.",
+          "Eres un experto en matemáticas que genera cuestionarios educativos con fórmulas LaTeX. IMPORTANTE: Distribuye aleatoriamente las respuestas correctas entre las opciones a, b, c y d. No coloques siempre la respuesta correcta en la misma opción. SIEMPRE deja un espacio antes y después de cada expresión matemática. UTILIZA ÚNICAMENTE el formato a), b), c), d) para las opciones.",
       },
       { role: "user", content: prompt },
     ],
