@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Loader2, RefreshCw, CheckCircle2, XCircle, Info } from "lucide-react"
+import { Loader2, RefreshCw, CheckCircle2, XCircle } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
@@ -176,10 +176,29 @@ export function QuizInterface() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          generateQuiz: true,
-          mainTopic: selectedMainTopic,
-          subTopic: selectedSubTopic,
-          includeExplanations: true, // Solicitar explícitamente explicaciones
+          messages: [
+            {
+              role: "system",
+              content:
+                "Eres un asistente especializado en generar cuestionarios educativos con explicaciones detalladas.",
+            },
+            {
+              role: "user",
+              content: `Genera un cuestionario de 5 preguntas sobre ${selectedMainTopic} - ${selectedSubTopic}. 
+              Cada pregunta debe tener 4 opciones y debe incluir la respuesta correcta y una explicación detallada de por qué es correcta.
+              
+              Formato para cada pregunta:
+              [Pregunta]
+              A) [Opción A]
+              B) [Opción B]
+              C) [Opción C]
+              D) [Opción D]
+              
+              Respuesta correcta: [letra]
+              
+              Explicación: [explicación detallada]`,
+            },
+          ],
         }),
       })
 
@@ -209,38 +228,56 @@ export function QuizInterface() {
       // Buscar la línea que contiene "Respuesta correcta:"
       const correctAnswerLineIndex = lines.findIndex((line) => line.toLowerCase().includes("respuesta correcta:"))
 
+      if (correctAnswerLineIndex === -1) {
+        console.error("No se encontró la respuesta correcta para la pregunta:", questionText)
+        return {
+          question: questionText,
+          options: lines.slice(1, 5).map((o) => o.replace(/^[A-Da-d]\)\s*([a-d]\))?\s*/, "").trim()),
+          correctAnswer: "a", // Valor predeterminado
+          userAnswer: "",
+          explanation: "",
+        }
+      }
+
       // Extraer opciones hasta la línea de respuesta correcta
-      const options = lines.slice(1, correctAnswerLineIndex).map((o) => o.replace(/^[a-d]\)\s*/, "").trim())
+      const options = lines.slice(1, correctAnswerLineIndex).map((o) => {
+        // Eliminar cualquier formato de letra duplicada como "A) a)" o similar
+        return o.replace(/^[A-Da-d]\)\s*([a-d]\))?\s*/, "").trim()
+      })
 
       // Extraer la respuesta correcta
       const correctAnswerLine = lines[correctAnswerLineIndex]
-      const correctAnswer = correctAnswerLine
-        .replace(/respuesta correcta:\s*/i, "")
-        .trim()
-        .toLowerCase()
+      const correctAnswerMatch = correctAnswerLine.match(/respuesta correcta:\s*([A-Da-d])/i)
+      const correctAnswer = correctAnswerMatch
+        ? correctAnswerMatch[1].toLowerCase()
+        : correctAnswerLine
+            .replace(/respuesta correcta:\s*/i, "")
+            .trim()
+            .toLowerCase()
 
-      // Buscar explicación si existe (después de la respuesta correcta)
+      // Buscar explicación después de la respuesta correcta
       let explanation = ""
-      if (correctAnswerLineIndex < lines.length - 1) {
-        // Buscar específicamente una línea que comience con "Explicación:" o extraer todo lo que sigue
-        const explanationLineIndex = lines.findIndex(
-          (line, idx) => idx > correctAnswerLineIndex && line.toLowerCase().includes("explicación:"),
-        )
 
-        if (explanationLineIndex !== -1) {
-          // Si hay una línea específica de "Explicación:", tomar desde ahí
-          explanation = lines
-            .slice(explanationLineIndex)
-            .join("\n")
-            .replace(/^explicación:\s*/i, "")
-            .trim()
-        } else {
-          // Si no, tomar todo lo que sigue después de la respuesta correcta
-          explanation = lines
-            .slice(correctAnswerLineIndex + 1)
-            .join("\n")
-            .trim()
-        }
+      // Buscar la línea que comienza con "Explicación:"
+      const explanationLineIndex = lines.findIndex(
+        (line, idx) => idx > correctAnswerLineIndex && line.toLowerCase().includes("explicación:"),
+      )
+
+      if (explanationLineIndex !== -1) {
+        // Eliminar el prefijo "Explicación:" y cualquier duplicado
+        explanation = lines
+          .slice(explanationLineIndex)
+          .join("\n")
+          .replace(/^explicación:\s*(explicación:)?\s*/i, "")
+          .trim()
+      } else if (correctAnswerLineIndex < lines.length - 1) {
+        // Si no hay una línea específica, tomar todo lo que sigue después de la respuesta correcta
+        explanation = lines
+          .slice(correctAnswerLineIndex + 1)
+          .join("\n")
+          .trim()
+          .replace(/^explicación:\s*(explicación:)?\s*/i, "")
+          .trim()
       }
 
       return {
@@ -339,12 +376,16 @@ export function QuizInterface() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            generateExplanation: true,
-            question: question.question,
-            options: question.options,
-            correctAnswer: correctOptionText,
-            mainTopic: selectedMainTopic,
-            subTopic: selectedSubTopic,
+            messages: [
+              {
+                role: "system",
+                content: "Eres un asistente especializado en explicar conceptos matemáticos de manera clara y concisa.",
+              },
+              {
+                role: "user",
+                content: `Explica por qué la respuesta correcta a esta pregunta es "${correctOptionText}". La pregunta es: "${question.question}". Las opciones son: ${question.options.map((opt, idx) => `${String.fromCharCode(65 + idx)}) ${opt}`).join(", ")}.`,
+              },
+            ],
           }),
         })
 
@@ -435,6 +476,7 @@ export function QuizInterface() {
       >
         {question.options.map((option, optionIndex) => {
           const optionLetter = String.fromCharCode(97 + optionIndex)
+          const optionLetterUpper = String.fromCharCode(65 + optionIndex)
           const isCorrect = optionLetter === question.correctAnswer
           const isSelected = question.userAnswer === optionLetter
           return (
@@ -464,7 +506,7 @@ export function QuizInterface() {
                 }`}
               >
                 <div className="flex items-start">
-                  <span className="mr-2">{optionLetter.toUpperCase()})</span>
+                  <span className="mr-2">{optionLetterUpper})</span>
                   <div className="flex-1">{renderMathExpression(option)}</div>
                   {showResults && isCorrect && (
                     <CheckCircle2 className="text-green-600 dark:text-green-400 ml-2 h-5 w-5 flex-shrink-0" />
@@ -479,29 +521,20 @@ export function QuizInterface() {
         })}
       </RadioGroup>
       {showResults && (
-        <div className="mt-4">
-          {isLoadingExplanations && !question.explanation ? (
-            <div className="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-md flex items-center">
-              <Loader2 className="h-4 w-4 mr-2 animate-spin text-blue-600 dark:text-blue-400" />
-              <span className="text-blue-700 dark:text-blue-200">Generando explicación...</span>
-            </div>
-          ) : question.explanation ? (
-            <div className="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-md">
-              <h4 className="font-semibold text-blue-800 dark:text-blue-300 flex items-center">
-                <Info className="h-4 w-4 mr-1" /> Explicación:
-              </h4>
-              <div className="text-blue-700 dark:text-blue-200 mt-1">{renderMathExpression(question.explanation)}</div>
-            </div>
-          ) : (
-            <div className="p-3 bg-amber-100 dark:bg-amber-900/20 rounded-md">
-              <h4 className="font-semibold text-amber-800 dark:text-amber-300 flex items-center">
-                <Info className="h-4 w-4 mr-1" /> Respuesta correcta:
-              </h4>
-              <div className="text-amber-700 dark:text-amber-200 mt-1">
-                La respuesta correcta es la opción {question.correctAnswer.toUpperCase()}.
+        <div className="mt-4 p-3 bg-blue-100 dark:bg-blue-900/20 rounded-md">
+          <h4 className="font-semibold text-blue-800 dark:text-blue-300">Explicación:</h4>
+          <div className="text-blue-700 dark:text-blue-200">
+            {isLoadingExplanations && !question.explanation ? (
+              <div className="flex items-center">
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                <span>Generando explicación...</span>
               </div>
-            </div>
-          )}
+            ) : question.explanation ? (
+              renderMathExpression(question.explanation)
+            ) : (
+              `La respuesta correcta es la opción ${question.correctAnswer.toUpperCase()}.`
+            )}
+          </div>
         </div>
       )}
     </div>
