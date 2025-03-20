@@ -301,16 +301,16 @@ export function QuizInterface() {
     }
   }
 
+  // Versión mejorada de handleSubmitQuiz
   const handleSubmitQuiz = async () => {
     if (!quiz) return
 
     setShowResults(true)
     
-
-    // Generar explicaciones para preguntas que no las tienen
+    // Primero, generar explicaciones para todas las preguntas
     await generateMissingExplanations()
     
-    // Obtener las preguntas correctas DESPUÉS de generar las explicaciones
+    // Ahora que tenemos las explicaciones, filtrar las preguntas correctas
     const correctQuestions = quiz.filter((q) => q.correctAnswer.toLowerCase() === q.userAnswer?.toLowerCase())
 
     if (correctQuestions.length > 0) {
@@ -320,7 +320,8 @@ export function QuizInterface() {
           correctQuestions.map(q => ({
             question: q.question.substring(0, 20) + "...",
             hasExplanation: !!q.explanation,
-            explanationLength: q.explanation ? q.explanation.length : 0
+            explanationLength: q.explanation ? q.explanation.length : 0,
+            explanation: q.explanation ? q.explanation.substring(0, 30) + "..." : "NO EXPLANATION"
           }))
         )
 
@@ -348,14 +349,19 @@ export function QuizInterface() {
     }
   }
 
-  // Función para generar explicaciones para preguntas que no las tienen
+  // Versión mejorada de generateMissingExplanations
   const generateMissingExplanations = async () => {
     if (!quiz) return
 
+    // Generar explicaciones para TODAS las preguntas que no las tienen
     const questionsWithoutExplanations = quiz.filter((q) => !q.explanation || q.explanation.trim() === "")
+    
+    if (questionsWithoutExplanations.length === 0) {
+      console.log("Todas las preguntas ya tienen explicaciones")
+      return
+    }
 
-    if (questionsWithoutExplanations.length === 0) return
-
+    console.log(`Generando explicaciones para ${questionsWithoutExplanations.length} preguntas`)
     setIsLoadingExplanations(true)
 
     try {
@@ -367,6 +373,8 @@ export function QuizInterface() {
 
         const question = quiz[questionIndex]
         const correctOptionText = question.options[question.correctAnswer.charCodeAt(0) - 97]
+
+        console.log(`Generando explicación para pregunta ${i+1}/${questionsWithoutExplanations.length}: "${question.question.substring(0, 30)}..."`)
 
         const response = await fetch("/api/chat", {
           method: "POST",
@@ -389,10 +397,16 @@ export function QuizInterface() {
 
         if (response.ok) {
           const data = await response.json()
+          const explanation = data.content.trim()
+          
+          console.log(`Explicación generada (${explanation.length} caracteres): "${explanation.substring(0, 50)}..."`)
+          
           updatedQuiz[questionIndex] = {
             ...updatedQuiz[questionIndex],
-            explanation: data.content.trim(),
+            explanation: explanation,
           }
+        } else {
+          console.error(`Error al generar explicación para pregunta ${i+1}:`, await response.text())
         }
       }
 
@@ -404,9 +418,12 @@ export function QuizInterface() {
         updatedQuiz.map(q => ({
           question: q.question.substring(0, 20) + "...",
           hasExplanation: !!q.explanation,
-          explanationLength: q.explanation ? q.explanation.length : 0
+          explanationLength: q.explanation ? q.explanation.length : 0,
+          explanation: q.explanation ? q.explanation.substring(0, 30) + "..." : "NO EXPLANATION"
         }))
       )
+      
+      return updatedQuiz; // Devolver el quiz actualizado para que handleSubmitQuiz pueda usarlo
     } catch (error) {
       console.error("Error al generar explicaciones:", error)
     } finally {
@@ -689,4 +706,3 @@ export function QuizInterface() {
     </div>
   )
 }
-

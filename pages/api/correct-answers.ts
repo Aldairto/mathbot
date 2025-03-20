@@ -47,40 +47,65 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ error: "correctAnswers debe ser un array" })
       }
 
-      // Depuración para verificar los datos recibidos
+      // Depuración detallada para verificar los datos recibidos
       console.log("Datos recibidos para guardar:", 
         correctAnswers.map((a: any) => ({
           question: a.question.substring(0, 20) + "...",
           hasExplanation: !!a.explanation,
-          explanationLength: a.explanation ? a.explanation.length : 0
+          explanationLength: a.explanation ? a.explanation.length : 0,
+          explanation: a.explanation ? a.explanation.substring(0, 30) + "..." : "NO EXPLANATION"
         }))
       )
 
-      // Usar $transaction con create individual para mejor control y depuración
-      const savedAnswers = await prisma.$transaction(
-        correctAnswers.map((answer: any) => 
-          prisma.correctAnswer.create({
-            data: {
-              question: answer.question,
-              answer: answer.answer,
-              explanation: answer.explanation || null, // Manejar explícitamente el campo de explicación
-              mainTopic: answer.mainTopic,
-              subTopic: answer.subTopic,
-              userId,
-            },
+      // Verificar si hay explicaciones vacías y registrarlas
+      const emptyExplanations = correctAnswers.filter((a: any) => !a.explanation || a.explanation.trim() === "")
+      if (emptyExplanations.length > 0) {
+        console.warn(`ADVERTENCIA: ${emptyExplanations.length} respuestas no tienen explicación`)
+      }
+
+      try {
+        // Usar $transaction con create individual para mejor control y depuración
+        const savedAnswers = await prisma.$transaction(
+          correctAnswers.map((answer: any) => {
+            // Registrar cada operación de creación
+            console.log(`Creando respuesta correcta: "${answer.question.substring(0, 20)}..." con explicación: ${answer.explanation ? "SÍ" : "NO"}`)
+            
+            return prisma.correctAnswer.create({
+              data: {
+                question: answer.question,
+                answer: answer.answer,
+                explanation: answer.explanation || null, // Manejar explícitamente el campo de explicación
+                mainTopic: answer.mainTopic,
+                subTopic: answer.subTopic,
+                userId,
+              },
+            })
           })
         )
-      )
+	   
 
-      res.status(200).json({ 
-        message: "Respuestas correctas guardadas", 
-        count: savedAnswers.length,
-        savedAnswers: savedAnswers.map(a => ({
-          id: a.id,
-          hasExplanation: !!a.explanation,
-          explanationLength: a.explanation ? a.explanation.length : 0
-        }))
-      })
+        // Verificar las respuestas guardadas
+        console.log("Respuestas guardadas en la base de datos:", 
+          savedAnswers.map(a => ({
+            id: a.id,
+            hasExplanation: !!a.explanation,
+            explanationLength: a.explanation ? a.explanation.length : 0
+          }))
+        )
+
+        res.status(200).json({ 
+          message: "Respuestas correctas guardadas", 
+          count: savedAnswers.length,
+          savedAnswers: savedAnswers.map(a => ({
+            id: a.id,
+            hasExplanation: !!a.explanation,
+            explanationLength: a.explanation ? a.explanation.length : 0
+          }))
+        })
+      } catch (error) {
+        console.error("Error al guardar respuestas correctas:", error)
+        res.status(500).json({ error: "Error al guardar respuestas correctas", details: error.message })
+      }
     } else {
       res.setHeader("Allow", ["GET", "POST"])
       res.status(405).end(`Method ${req.method} Not Allowed`)
