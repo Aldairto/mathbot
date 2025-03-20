@@ -318,6 +318,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(404).json({ error: "No se encontraron respuestas correctas" })
     }
 
+    // Depuración para verificar si las explicaciones están presentes
+    console.log("Respuestas para PDF:", 
+      correctAnswers.map(a => ({
+        id: a.id,
+        hasExplanation: !!a.explanation,
+        explanationLength: a.explanation ? a.explanation.length : 0
+      }))
+    )
+
     const doc = new jsPDF()
     doc.setFont("helvetica", "normal")
     doc.setFontSize(18)

@@ -305,14 +305,26 @@ export function QuizInterface() {
     if (!quiz) return
 
     setShowResults(true)
-    const correctQuestions = quiz.filter((q) => q.correctAnswer.toLowerCase() === q.userAnswer?.toLowerCase())
+    
 
     // Generar explicaciones para preguntas que no las tienen
     await generateMissingExplanations()
+    
+    // Obtener las preguntas correctas DESPUÉS de generar las explicaciones
+    const correctQuestions = quiz.filter((q) => q.correctAnswer.toLowerCase() === q.userAnswer?.toLowerCase())
 
     if (correctQuestions.length > 0) {
       try {
-        await fetch("/api/correct-answers", {
+        // Depuración para verificar las explicaciones antes de enviar
+        console.log("Enviando respuestas correctas con explicaciones:", 
+          correctQuestions.map(q => ({
+            question: q.question.substring(0, 20) + "...",
+            hasExplanation: !!q.explanation,
+            explanationLength: q.explanation ? q.explanation.length : 0
+          }))
+        )
+
+        const response = await fetch("/api/correct-answers", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -321,12 +333,15 @@ export function QuizInterface() {
             correctAnswers: correctQuestions.map((q) => ({
               question: q.question,
               answer: q.options[q.correctAnswer.charCodeAt(0) - 97],
-              explanation: q.explanation || "", // Añadir la explicación
+              explanation: q.explanation || "", // Asegurarse de incluir la explicación
               mainTopic: selectedMainTopic,
               subTopic: selectedSubTopic,
             })),
           }),
         })
+        
+        const result = await response.json()
+        console.log("Respuesta del servidor al guardar respuestas correctas:", result)
       } catch (error) {
         console.error("Error al guardar las respuestas correctas:", error)
       }
@@ -381,7 +396,17 @@ export function QuizInterface() {
         }
       }
 
+      // Actualizar el estado del quiz con las explicaciones generadas
       setQuiz(updatedQuiz)
+      
+      // Depuración para verificar las explicaciones generadas
+      console.log("Explicaciones generadas:", 
+        updatedQuiz.map(q => ({
+          question: q.question.substring(0, 20) + "...",
+          hasExplanation: !!q.explanation,
+          explanationLength: q.explanation ? q.explanation.length : 0
+        }))
+      )
     } catch (error) {
       console.error("Error al generar explicaciones:", error)
     } finally {
@@ -486,8 +511,8 @@ export function QuizInterface() {
                       : isSelected
                         ? "text-red-600 dark:text-red-400"
                         : ""
-                  : ""
-              }`}
+                    : ""
+                }`}
               >
                 <div className="flex items-start">
                   <span className="mr-2">{optionLetterUpper})</span>

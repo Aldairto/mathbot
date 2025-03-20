@@ -56,18 +56,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }))
       )
 
-      const savedAnswers = await prisma.correctAnswer.createMany({
-        data: correctAnswers.map((answer: any) => ({
-          question: answer.question,
-          answer: answer.answer,
-          explanation: answer.explanation || null, // Manejar explícitamente el campo de explicación
-          mainTopic: answer.mainTopic,
-          subTopic: answer.subTopic,
-          userId,
-        })),
-      })
+      // Usar $transaction con create individual para mejor control y depuración
+      const savedAnswers = await prisma.$transaction(
+        correctAnswers.map((answer: any) => 
+          prisma.correctAnswer.create({
+            data: {
+              question: answer.question,
+              answer: answer.answer,
+              explanation: answer.explanation || null, // Manejar explícitamente el campo de explicación
+              mainTopic: answer.mainTopic,
+              subTopic: answer.subTopic,
+              userId,
+            },
+          })
+        )
+      )
 
-      res.status(200).json({ message: "Respuestas correctas guardadas", count: savedAnswers.count })
+      res.status(200).json({ 
+        message: "Respuestas correctas guardadas", 
+        count: savedAnswers.length,
+        savedAnswers: savedAnswers.map(a => ({
+          id: a.id,
+          hasExplanation: !!a.explanation,
+          explanationLength: a.explanation ? a.explanation.length : 0
+        }))
+      })
     } else {
       res.setHeader("Allow", ["GET", "POST"])
       res.status(405).end(`Method ${req.method} Not Allowed`)
