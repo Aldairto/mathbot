@@ -13,7 +13,7 @@ type CorrectAnswer = {
   id: string
   question: string
   answer: string
-  explanation?: string // Añadir campo opcional para la explicación
+  explanation?: string // Campo opcional para la explicación
   mainTopic: string
   subTopic: string
   createdAt: string
@@ -43,6 +43,7 @@ export function CorrectAnswersHistory() {
       const response = await fetch("/api/correct-answers")
       if (response.ok) {
         const data = await response.json()
+        console.log("Respuestas correctas recibidas:", data.correctAnswers) // Depuración
         setCorrectAnswers(data.correctAnswers)
         const uniqueTopics = Array.from(new Set(data.correctAnswers.map((answer: CorrectAnswer) => answer.mainTopic)))
         setTopics(uniqueTopics)
@@ -125,25 +126,33 @@ export function CorrectAnswersHistory() {
       </CardHeader>
       <CardContent>
         <ScrollArea className="h-[300px]">
-          {filteredAnswers.map((answer) => (
-            <div key={answer.id} className="mb-4 p-2 border-b">
-              <p className="font-semibold">{renderMathExpression(answer.question)}</p>
-              <p>Respuesta: {renderMathExpression(answer.answer)}</p>
-              
-              {/* Mostrar la explicación si existe */}
-              {answer.explanation && (
-                <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded">
-                  <p className="text-sm font-medium text-blue-800 dark:text-blue-300">Explicación:</p>
-                  <p className="text-sm text-blue-700 dark:text-blue-200">{renderMathExpression(answer.explanation)}</p>
-                </div>
-              )}
-              
-              <p className="text-sm text-muted-foreground mt-2">
-                {answer.mainTopic} - {answer.subTopic}
-              </p>
-              <p className="text-xs text-muted-foreground">{new Date(answer.createdAt).toLocaleString()}</p>
-            </div>
-          ))}
+          {filteredAnswers.length === 0 ? (
+            <p className="text-center text-muted-foreground py-8">No hay respuestas correctas guardadas</p>
+          ) : (
+            filteredAnswers.map((answer) => (
+              <div key={answer.id} className="mb-4 p-2 border-b">
+                <p className="font-semibold">{renderMathExpression(answer.question)}</p>
+                <p className="mt-1">
+                  <span className="font-medium">Respuesta:</span> {renderMathExpression(answer.answer)}
+                </p>
+                
+                {/* Mostrar la explicación si existe - Asegurarse de que esta sección se renderice */}
+                {answer.explanation && answer.explanation.trim() !== "" && (
+                  <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded">
+                    <p className="text-sm font-medium text-blue-800 dark:text-blue-300">Explicación:</p>
+                    <p className="text-sm text-blue-700 dark:text-blue-200">
+                      {renderMathExpression(answer.explanation)}
+                    </p>
+                  </div>
+                )}
+                
+                <p className="text-sm text-muted-foreground mt-2">
+                  {answer.mainTopic} - {answer.subTopic}
+                </p>
+                <p className="text-xs text-muted-foreground">{new Date(answer.createdAt).toLocaleString()}</p>
+              </div>
+            ))
+          )}
         </ScrollArea>
       </CardContent>
     </Card>

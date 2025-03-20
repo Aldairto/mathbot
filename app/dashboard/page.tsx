@@ -367,10 +367,7 @@ export default function DashboardPage() {
         
         <TabsContent value="history">
           <Card>
-            <CardHeader>
-              <CardTitle className="text-xl">Historial de Respuestas Correctas</CardTitle>
-              <CardDescription>Revisa tus respuestas correctas para reforzar tu aprendizaje</CardDescription>
-            </CardHeader>
+           
             <CardContent>
               <CorrectAnswersHistory />
             </CardContent>

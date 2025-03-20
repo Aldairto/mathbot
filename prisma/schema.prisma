@@ -74,15 +74,15 @@ model Topic {
 }
 
 model CorrectAnswer {
-  id        String   @id @default(cuid())
-  userId    String
-  question  String
-  answer    String
-  explanation String?  // Campo opcional para la explicación
-  mainTopic String
-  subTopic  String
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
+  id          String   @id @default(cuid())
+  question    String   @db.Text
+  answer      String   @db.Text
+  explanation String?  @db.Text  // Campo opcional para la explicación
+  mainTopic   String
+  subTopic    String
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
 
   @@index([userId])
 }

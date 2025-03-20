@@ -14,11 +14,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const userId = session.user.id
 
     if (req.method === "GET") {
+      // Asegurarse de incluir el campo explanation en la consulta
       const correctAnswers = await prisma.correctAnswer.findMany({
         where: { userId },
         orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          question: true,
+          answer: true,
+          explanation: true, // Asegurarse de seleccionar este campo
+          mainTopic: true,
+          subTopic: true,
+          createdAt: true,
+        },
         take: 50, // Limitar a las últimas 50 respuestas correctas
       })
+
+      // Depuración para verificar si las explicaciones están presentes
+      console.log("Respuestas correctas enviadas:", 
+        correctAnswers.map(a => ({
+          id: a.id,
+          hasExplanation: !!a.explanation,
+          explanationLength: a.explanation ? a.explanation.length : 0
+        }))
+      )
 
       res.status(200).json({ correctAnswers })
     } else if (req.method === "POST") {
@@ -28,8 +47,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ error: "correctAnswers debe ser un array" })
       }
 
+      // Depuración para verificar los datos recibidos
+      console.log("Datos recibidos para guardar:", 
+        correctAnswers.map((a: any) => ({
+          question: a.question.substring(0, 20) + "...",
+          hasExplanation: !!a.explanation,
+          explanationLength: a.explanation ? a.explanation.length : 0
+        }))
+      )
+
       const savedAnswers = await prisma.correctAnswer.createMany({
-        data: correctAnswers.map((answer) => ({
+        data: correctAnswers.map((answer: any) => ({
           question: answer.question,
           answer: answer.answer,
           explanation: answer.explanation || null, // Manejar explícitamente el campo de explicación
