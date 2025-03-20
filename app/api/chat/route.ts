@@ -26,6 +26,33 @@ function getOpenAIKey() {
   return key
 }
 
+// Lista de temas permitidos
+const ALLOWED_TOPICS = {
+  "1.1 Álgebra": [
+    "Razones",
+    "Proporciones",
+    "Sucesiones",
+    "Series",
+    "Polinomios",
+    "Ecuaciones lineales y ecuaciones cuadráticas",
+  ],
+  "1.2 Probabilidad y estadística": ["Estadística descriptiva", "Probabilidad"],
+  "1.3 Geometría y trigonometría": [
+    "Triángulos",
+    "Polígonos",
+    "Poliedros",
+    "Circunferencia y círculo",
+    "Triángulos rectángulos",
+    "Triángulos oblicuángulos",
+  ],
+  "1.4 Geometría analítica": [
+    "Lugar geométrico de rectas y curvas",
+    "Pendiente y ángulo de inclinación",
+    "Ecuación de la recta, de la circunferencia y de la parábola",
+  ],
+  "1.5 Funciones": ["Relaciones y funciones", "Graficación de funciones", "Función lineal", "Funciones cuadráticas"],
+};
+
 // Inicializar OpenAI con la clave API
 const openai = new OpenAI({
   apiKey: getOpenAIKey(),
@@ -137,6 +164,37 @@ export async function POST(req: Request) {
     const lastUserMessage = messages[messages.length - 1].content
     console.log("[API] Último mensaje del usuario:", lastUserMessage.substring(0, 50) + "...")
 
+    // Crear el mensaje del sistema con las restricciones temáticas
+    const systemMessage = `Eres un asistente matemático llamado MathBot especializado en matemáticas de nivel preparatoria para el examen Acredita Bach.
+
+RESTRICCIONES IMPORTANTES:
+1. SOLO debes responder preguntas relacionadas con los siguientes temas matemáticos:
+   ${Object.entries(ALLOWED_TOPICS).map(([topic, subtopics]) => 
+     `- ${topic}: ${subtopics.join(", ")}`
+   ).join("\n   ")}
+
+2. Si te preguntan sobre temas fuera de esta lista, responde amablemente: "Lo siento, solo puedo responder preguntas sobre temas matemáticos específicos de nivel preparatoria para el examen Acredita Bach."
+
+3. Si te preguntan quién te creó, quién te desarrolló, o sobre tu origen, responde: "Soy MathBot, un asistente matemático. No tengo información sobre mi creación."
+
+4. NO menciones a OpenAI, GPT, o cualquier otra tecnología de IA en tus respuestas.
+
+5. Adapta tus explicaciones al nivel de preparatoria, como si estuvieras ayudando a un estudiante a prepararse para el examen Acredita Bach.
+
+FORMATO MATEMÁTICO:
+Cuando uses expresiones matemáticas, SIEMPRE usa los siguientes delimitadores LaTeX:
+- Para fórmulas en línea: $...$ (NO uses \$$ \$$)
+- Para fórmulas en bloque: $$...$$ (NO uses \\[ \\])
+- Para ecuaciones alineadas: $$\\begin{align*} ... \\end{align*}$$
+
+Es CRUCIAL que:
+1. SIEMPRE uses $ $ para fórmulas en línea
+2. SIEMPRE uses $$ $$ para fórmulas en bloque
+3. NUNCA uses \$$ \$$ o \\[ \\]
+4. SIEMPRE uses los delimitadores para CADA símbolo matemático
+5. Usa asteriscos para énfasis (*cursiva* y **negrita**) en lugar de etiquetas HTML
+6. SIEMPRE deja un espacio antes y después de cada expresión matemática`
+
     // Llamar a la API de OpenAI
     console.log("[API] Llamando a la API de OpenAI")
     try {
@@ -145,24 +203,7 @@ export async function POST(req: Request) {
         messages: [
           {
             role: "system",
-            content: `Eres un asistente matemático llamado MathBot. 
-            Cuando uses expresiones matemáticas, SIEMPRE usa los siguientes delimitadores LaTeX:
-            - Para fórmulas en línea: $...$ (NO uses \$$ \$$)
-            - Para fórmulas en bloque: $$...$$ (NO uses \\[ \\])
-            - Para ecuaciones alineadas: $$\\begin{align*} ... \\end{align*}$$
-
-            Por ejemplo:
-            - En línea: La variable $x$ representa la incógnita
-            - En bloque: La ecuación es: 
-            $$y = mx + b$$
-
-            Es CRUCIAL que:
-            1. SIEMPRE uses $ $ para fórmulas en línea
-            2. SIEMPRE uses $$ $$ para fórmulas en bloque
-            3. NUNCA uses \$$ \$$ o \\[ \\]
-            4. SIEMPRE uses los delimitadores para CADA símbolo matemático
-            5. Usa asteriscos para énfasis (*cursiva* y **negrita**) en lugar de etiquetas HTML
-            6. SIEMPRE deja un espacio antes y después de cada expresión matemática`,
+            content: systemMessage,
           },
           {
             role: "user",
@@ -243,37 +284,37 @@ async function generateQuestionnaire(
   includeCorrectAnswer = false,
 ): Promise<string> {
   const prompt = `
-  Genera un cuestionario de 5 preguntas sobre ${mainTopic} - ${subTopic}.
-  Cada pregunta debe tener EXACTAMENTE 4 opciones de respuesta.
+Genera un cuestionario de 5 preguntas sobre ${mainTopic} - ${subTopic}.
+Cada pregunta debe tener EXACTAMENTE 4 opciones de respuesta.
 
-  FORMATO EXACTO (respeta este formato):
-  1. [Pregunta]
-  a) [Opción a]
-  b) [Opción b]
-  c) [Opción c]
-  d) [Opción d]
-  Respuesta correcta: [letra]
+FORMATO EXACTO (respeta este formato):
+1. [Pregunta]
+a) [Opción a]
+b) [Opción b]
+c) [Opción c]
+d) [Opción d]
+Respuesta correcta: [letra]
 
-  2. [Pregunta]
-  a) [Opción a]
-  b) [Opción b]
-  c) [Opción c]
-  d) [Opción d]
-  Respuesta correcta: [letra]
+2. [Pregunta]
+a) [Opción a]
+b) [Opción b]
+c) [Opción c]
+d) [Opción d]
+Respuesta correcta: [letra]
 
-  Y así sucesivamente...
+Y así sucesivamente...
 
-  IMPORTANTE:
-  - Cada pregunta DEBE tener exactamente 4 opciones, ni más ni menos.
-  - Las opciones DEBEN estar etiquetadas SOLO como a), b), c), d) - NO uses A), B), C), D) ni ningún otro formato.
-  - La respuesta correcta DEBE ser SOLO la letra (a, b, c o d).
-  - DISTRIBUYE ALEATORIAMENTE la respuesta correcta entre las cuatro opciones. NO coloques siempre la respuesta correcta en la opción "a".
-  - Para cada pregunta, elige una letra diferente como respuesta correcta si es posible.
-  - Asegúrate de que la letra de la respuesta correcta corresponda a una de las opciones.
-  - NO incluyas explicaciones adicionales, solo el formato especificado.
-  - Utiliza la sintaxis LaTeX con $ $ para las fórmulas matemáticas en línea y $$ $$ para las fórmulas en bloque.
-  - Asegúrate de que las preguntas sean variadas y cubran diferentes aspectos del subtema dentro del contexto del tema principal.
-  `
+IMPORTANTE:
+- Cada pregunta DEBE tener exactamente 4 opciones, ni más ni menos.
+- Las opciones DEBEN estar etiquetadas SOLO como a), b), c), d) - NO uses A), B), C), D) ni ningún otro formato.
+- La respuesta correcta DEBE ser SOLO la letra (a, b, c o d).
+- DISTRIBUYE ALEATORIAMENTE la respuesta correcta entre las cuatro opciones. NO coloques siempre la respuesta correcta en la opción "a".
+- Para cada pregunta, elige una letra diferente como respuesta correcta si es posible.
+- Asegúrate de que la letra de la respuesta correcta corresponda a una de las opciones.
+- NO incluyas explicaciones adicionales, solo el formato especificado.
+- Utiliza la sintaxis LaTeX con $ $ para las fórmulas matemáticas en línea y $$ $$ para las fórmulas en bloque.
+- Asegúrate de que las preguntas sean variadas y cubran diferentes aspectos del subtema dentro del contexto del tema principal.
+`
 
   const response = await openai.chat.completions.create({
     model: "gpt-3.5-turbo", // Cambiado a gpt-3.5-turbo para reducir tokens
@@ -294,4 +335,3 @@ async function generateQuestionnaire(
 
 // Aumentar el tiempo máximo de ejecución para evitar timeouts
 export const maxDuration = 60 // 60 segundos
-
