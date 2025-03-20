@@ -302,29 +302,52 @@ export function QuizInterface() {
   }
 
   // Versión mejorada de handleSubmitQuiz
-  const handleSubmitQuiz = async () => {
-    if (!quiz) return
+  // Versión corregida de handleSubmitQuiz que ESPERA a que se completen las explicaciones
+const handleSubmitQuiz = async () => {
+  if (!quiz) return
 
-    setShowResults(true)
+  setShowResults(true)
+  setIsLoadingExplanations(true)
+  
+  try {
+    console.log("Iniciando generación de explicaciones...")
     
-    // Primero, generar explicaciones para todas las preguntas
-    await generateMissingExplanations()
+    // IMPORTANTE: Esperar a que se completen las explicaciones
+    const updatedQuizWithExplanations = await generateMissingExplanations()
     
-    // Ahora que tenemos las explicaciones, filtrar las preguntas correctas
-    const correctQuestions = quiz.filter((q) => q.correctAnswer.toLowerCase() === q.userAnswer?.toLowerCase())
+    console.log("Explicaciones generadas completamente:", 
+      updatedQuizWithExplanations?.map(q => ({
+        question: q.question.substring(0, 20) + "...",
+        hasExplanation: !!q.explanation,
+        explanationLength: q.explanation ? q.explanation.length : 0
+      }))
+    )
+    
+    // Usar el quiz actualizado con explicaciones
+    const quizToUse = updatedQuizWithExplanations || quiz
+    
+    // Filtrar las preguntas correctas del quiz actualizado
+    const correctQuestions = quizToUse.filter(
+      (q) => q.correctAnswer.toLowerCase() === q.userAnswer?.toLowerCase()
+    )
 
     if (correctQuestions.length > 0) {
       try {
-        // Depuración para verificar las explicaciones antes de enviar
-        console.log("Enviando respuestas correctas con explicaciones:", 
-          correctQuestions.map(q => ({
-            question: q.question.substring(0, 20) + "...",
-            hasExplanation: !!q.explanation,
-            explanationLength: q.explanation ? q.explanation.length : 0,
-            explanation: q.explanation ? q.explanation.substring(0, 30) + "..." : "NO EXPLANATION"
-          }))
-        )
+        // Verificar que todas las preguntas correctas tengan explicaciones
+        const allHaveExplanations = correctQuestions.every(q => !!q.explanation && q.explanation.trim() !== "")
+        
+        if (!allHaveExplanations) {
+          console.warn("ADVERTENCIA: Algunas preguntas correctas no tienen explicaciones")
+          console.log("Preguntas correctas:", 
+            correctQuestions.map(q => ({
+              question: q.question.substring(0, 20) + "...",
+              hasExplanation: !!q.explanation,
+              explanationLength: q.explanation ? q.explanation.length : 0
+            }))
+          )
+        }
 
+        // Enviar los datos al servidor
         const response = await fetch("/api/correct-answers", {
           method: "POST",
           headers: {
@@ -347,35 +370,47 @@ export function QuizInterface() {
         console.error("Error al guardar las respuestas correctas:", error)
       }
     }
+  } catch (error) {
+    console.error("Error en handleSubmitQuiz:", error)
+  } finally {
+    setIsLoadingExplanations(false)
+  }
+}
+
+// Versión corregida de generateMissingExplanations que devuelve el quiz actualizado
+const generateMissingExplanations = async () => {
+  if (!quiz) return null
+
+  // Generar explicaciones para TODAS las preguntas correctas que no las tienen
+  const correctQuestions = quiz.filter(
+    (q) => q.correctAnswer.toLowerCase() === q.userAnswer?.toLowerCase()
+  )
+  
+  const questionsWithoutExplanations = correctQuestions.filter(
+    (q) => !q.explanation || q.explanation.trim() === ""
+  )
+  
+  if (questionsWithoutExplanations.length === 0) {
+    console.log("Todas las preguntas correctas ya tienen explicaciones")
+    return quiz
   }
 
-  // Versión mejorada de generateMissingExplanations
-  const generateMissingExplanations = async () => {
-    if (!quiz) return
+  console.log(`Generando explicaciones para ${questionsWithoutExplanations.length} preguntas correctas`)
+  setIsLoadingExplanations(true)
 
-    // Generar explicaciones para TODAS las preguntas que no las tienen
-    const questionsWithoutExplanations = quiz.filter((q) => !q.explanation || q.explanation.trim() === "")
-    
-    if (questionsWithoutExplanations.length === 0) {
-      console.log("Todas las preguntas ya tienen explicaciones")
-      return
-    }
+  try {
+    const updatedQuiz = [...quiz]
 
-    console.log(`Generando explicaciones para ${questionsWithoutExplanations.length} preguntas`)
-    setIsLoadingExplanations(true)
+    for (let i = 0; i < questionsWithoutExplanations.length; i++) {
+      const questionIndex = quiz.findIndex((q) => q === questionsWithoutExplanations[i])
+      if (questionIndex === -1) continue
 
-    try {
-      const updatedQuiz = [...quiz]
+      const question = quiz[questionIndex]
+      const correctOptionText = question.options[question.correctAnswer.charCodeAt(0) - 97]
 
-      for (let i = 0; i < questionsWithoutExplanations.length; i++) {
-        const questionIndex = quiz.findIndex((q) => q === questionsWithoutExplanations[i])
-        if (questionIndex === -1) continue
+      console.log(`Generando explicación para pregunta ${i+1}/${questionsWithoutExplanations.length}: "${question.question.substring(0, 30)}..."`)
 
-        const question = quiz[questionIndex]
-        const correctOptionText = question.options[question.correctAnswer.charCodeAt(0) - 97]
-
-        console.log(`Generando explicación para pregunta ${i+1}/${questionsWithoutExplanations.length}: "${question.question.substring(0, 30)}..."`)
-
+      try {
         const response = await fetch("/api/chat", {
           method: "POST",
           headers: {
@@ -407,29 +442,46 @@ export function QuizInterface() {
           }
         } else {
           console.error(`Error al generar explicación para pregunta ${i+1}:`, await response.text())
+          // Proporcionar una explicación predeterminada en caso de error
+          updatedQuiz[questionIndex] = {
+            ...updatedQuiz[questionIndex],
+            explanation: `La respuesta correcta es la opción ${question.correctAnswer.toUpperCase()}: ${correctOptionText}`,
+          }
+        }
+      } catch (error) {
+        console.error(`Error al generar explicación para pregunta ${i+1}:`, error)
+        // Proporcionar una explicación predeterminada en caso de error
+        updatedQuiz[questionIndex] = {
+          ...updatedQuiz[questionIndex],
+          explanation: `La respuesta correcta es la opción ${question.correctAnswer.toUpperCase()}: ${correctOptionText}`,
         }
       }
-
-      // Actualizar el estado del quiz con las explicaciones generadas
-      setQuiz(updatedQuiz)
       
-      // Depuración para verificar las explicaciones generadas
-      console.log("Explicaciones generadas:", 
-        updatedQuiz.map(q => ({
-          question: q.question.substring(0, 20) + "...",
-          hasExplanation: !!q.explanation,
-          explanationLength: q.explanation ? q.explanation.length : 0,
-          explanation: q.explanation ? q.explanation.substring(0, 30) + "..." : "NO EXPLANATION"
-        }))
-      )
-      
-      return updatedQuiz; // Devolver el quiz actualizado para que handleSubmitQuiz pueda usarlo
-    } catch (error) {
-      console.error("Error al generar explicaciones:", error)
-    } finally {
-      setIsLoadingExplanations(false)
+      // Pequeña pausa para evitar sobrecargar la API
+      await new Promise(resolve => setTimeout(resolve, 500))
     }
+
+    // Actualizar el estado del quiz con las explicaciones generadas
+    setQuiz(updatedQuiz)
+    
+    // Depuración para verificar las explicaciones generadas
+    console.log("Explicaciones generadas:", 
+      updatedQuiz.map(q => ({
+        question: q.question.substring(0, 20) + "...",
+        hasExplanation: !!q.explanation,
+        explanationLength: q.explanation ? q.explanation.length : 0,
+        explanation: q.explanation ? q.explanation.substring(0, 30) + "..." : "NO EXPLANATION"
+      }))
+    )
+    
+    return updatedQuiz; // Devolver el quiz actualizado para que handleSubmitQuiz pueda usarlo
+  } catch (error) {
+    console.error("Error al generar explicaciones:", error)
+    return null;
+  } finally {
+    setIsLoadingExplanations(false)
   }
+}
 
   const handleRetakeQuiz = () => {
     setShowResults(false)

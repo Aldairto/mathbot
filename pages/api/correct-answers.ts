@@ -61,6 +61,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const emptyExplanations = correctAnswers.filter((a: any) => !a.explanation || a.explanation.trim() === "")
       if (emptyExplanations.length > 0) {
         console.warn(`ADVERTENCIA: ${emptyExplanations.length} respuestas no tienen explicación`)
+        
+        // Agregar explicaciones predeterminadas para evitar valores nulos
+        correctAnswers.forEach((answer: any) => {
+          if (!answer.explanation || answer.explanation.trim() === "") {
+            answer.explanation = `La respuesta correcta es: ${answer.answer}`
+          }
+        })
       }
 
       try {
@@ -74,7 +81,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               data: {
                 question: answer.question,
                 answer: answer.answer,
-                explanation: answer.explanation || null, // Manejar explícitamente el campo de explicación
+                explanation: answer.explanation || `La respuesta correcta es: ${answer.answer}`, // Nunca permitir null
                 mainTopic: answer.mainTopic,
                 subTopic: answer.subTopic,
                 userId,
@@ -82,7 +89,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             })
           })
         )
-	   
 
         // Verificar las respuestas guardadas
         console.log("Respuestas guardadas en la base de datos:", 
@@ -115,4 +121,3 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(500).json({ error: "Error interno del servidor" })
   }
 }
-
