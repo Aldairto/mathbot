@@ -334,4 +334,4 @@ IMPORTANTE:
 }
 
 // Aumentar el tiempo máximo de ejecución para evitar timeouts
-export const maxDuration = 60 // 60 segundos
+export const maxDuration = 60 // 60 segundos2

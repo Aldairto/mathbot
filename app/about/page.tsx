@@ -1,10 +1,17 @@
+"use client"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { BookOpen, Clock, FileText, BarChart2, MessageSquare, Download, CheckCircle, Brain } from 'lucide-react'
+import { BookOpen, Clock, FileText, BarChart2, MessageSquare, Download, CheckCircle, Brain, LogIn } from 'lucide-react'
+import { useSession } from "next-auth/react"
 
 export default function AboutPage() {
+  // Obtener el estado de la sesión
+  const { data: session, status } = useSession()
+  const isAuthenticated = status === "authenticated"
+
   return (
     <div className="container mx-auto py-8 max-w-4xl">
       <h1 className="text-3xl font-bold mb-6 text-center">Acerca de MathBot</h1>
@@ -28,18 +35,31 @@ export default function AboutPage() {
             </p>
             
             <div className="mt-6 flex flex-wrap gap-4 justify-center">
-              <Link href="/chat">
-                <Button className="flex items-center gap-2">
-                  <MessageSquare size={18} />
-                  Iniciar chat
-                </Button>
-              </Link>
-              <Link href="/quiz">
-                <Button variant="outline" className="flex items-center gap-2">
-                  <FileText size={18} />
-                  Generar cuestionario
-                </Button>
-              </Link>
+              {isAuthenticated ? (
+                // Mostrar botones de navegación solo si el usuario está autenticado
+                <>
+                  <Link href="/chat">
+                    <Button className="flex items-center gap-2">
+                      <MessageSquare size={18} />
+                      Iniciar chat
+                    </Button>
+                  </Link>
+                  <Link href="/quiz">
+                    <Button variant="outline" className="flex items-center gap-2">
+                      <FileText size={18} />
+                      Generar cuestionario
+                    </Button>
+                  </Link>
+                </>
+              ) : (
+                // Mostrar botón de inicio de sesión si el usuario no está autenticado
+                <Link href="/login">
+                  <Button className="flex items-center gap-2">
+                    <LogIn size={18} />
+                    Iniciar sesión para acceder
+                  </Button>
+                </Link>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -106,6 +126,69 @@ export default function AboutPage() {
           </CardContent>
         </Card>
       </div>
+
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>Inteligencia Artificial Educativa</CardTitle>
+          <CardDescription>Cómo la IA generativa potencia el aprendizaje matemático</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="mb-4">
+            MathBot aprovecha la potencia de la <strong>inteligencia artificial generativa</strong> y <strong>sistemas inteligentes</strong> 
+            especializados en educación matemática. Estas tecnologías avanzadas permiten crear una experiencia de aprendizaje 
+            personalizada, adaptativa y altamente efectiva para la preparación del examen Acredita Bach.
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <div className="border rounded-lg p-4 bg-secondary/10">
+              <h3 className="text-lg font-semibold mb-2">IA Generativa Matemática</h3>
+              <p>
+                Utilizamos inteligencia artificial generativa especializada en matemáticas para crear 
+                explicaciones detalladas, ejemplos personalizados y cuestionarios adaptados al nivel 
+                educativo de preparatoria, con notación matemática precisa en formato LaTeX.
+              </p>
+            </div>
+            
+            <div className="border rounded-lg p-4 bg-secondary/10">
+              <h3 className="text-lg font-semibold mb-2">Sistemas Inteligentes de Aprendizaje</h3>
+              <p>
+                Nuestros sistemas inteligentes analizan patrones de aprendizaje para identificar 
+                áreas de mejora y proporcionar retroalimentación personalizada, optimizando el 
+                proceso de preparación para el examen.
+              </p>
+            </div>
+            
+            <div className="border rounded-lg p-4 bg-secondary/10">
+              <h3 className="text-lg font-semibold mb-2">Procesamiento de Lenguaje Matemático</h3>
+              <p>
+                MathBot comprende consultas matemáticas complejas gracias a algoritmos avanzados 
+                de procesamiento de lenguaje natural especializados en terminología y conceptos 
+                matemáticos de nivel preparatoria.
+              </p>
+            </div>
+            
+            <div className="border rounded-lg p-4 bg-secondary/10">
+              <h3 className="text-lg font-semibold mb-2">IA Especializada por Tema</h3>
+              <p>
+                Hemos entrenado nuestros modelos de IA para especializarse en los temas específicos 
+                del examen Acredita Bach, asegurando respuestas precisas y relevantes en álgebra, 
+                geometría, trigonometría, probabilidad y funciones.
+              </p>
+            </div>
+          </div>
+          
+          <div className="bg-primary/10 p-4 rounded-lg mt-6">
+            <h3 className="font-semibold mb-2">Innovación con propósito educativo</h3>
+            <p>
+              La inteligencia artificial generativa que impulsa MathBot ha sido desarrollada con un 
+              enfoque puramente educativo. Nuestros sistemas inteligentes están diseñados para 
+              complementar la enseñanza tradicional, proporcionando una herramienta adicional 
+              que ayuda a los estudiantes a dominar conceptos matemáticos fundamentales para 
+              su éxito académico.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
 
       <Card className="mb-8">
         <CardHeader>
@@ -180,9 +263,13 @@ export default function AboutPage() {
             <p className="text-sm mb-4">
               Interactúa con MathBot para resolver dudas matemáticas específicas. Recibe explicaciones claras con notación matemática adecuada.
             </p>
-            <Link href="/chat">
-              <Button variant="secondary" size="sm" className="w-full">Ir al chat</Button>
-            </Link>
+            {isAuthenticated ? (
+              <Link href="/chat">
+                <Button variant="secondary" size="sm" className="w-full">Ir al chat</Button>
+              </Link>
+            ) : (
+              <p className="text-xs text-muted-foreground italic">Inicia sesión para acceder al chat</p>
+            )}
           </CardContent>
         </Card>
         
@@ -197,9 +284,13 @@ export default function AboutPage() {
             <p className="text-sm mb-4">
               Genera cuestionarios personalizados por tema para practicar y evaluar tu conocimiento. Recibe retroalimentación inmediata.
             </p>
-            <Link href="/quiz">
-              <Button variant="secondary" size="sm" className="w-full">Crear cuestionario</Button>
-            </Link>
+            {isAuthenticated ? (
+              <Link href="/quiz">
+                <Button variant="secondary" size="sm" className="w-full">Crear cuestionario</Button>
+              </Link>
+            ) : (
+              <p className="text-xs text-muted-foreground italic">Inicia sesión para crear cuestionarios</p>
+            )}
           </CardContent>
         </Card>
         
@@ -214,9 +305,13 @@ export default function AboutPage() {
             <p className="text-sm mb-4">
               Revisa tu historial de respuestas correctas y descarga un PDF con explicaciones detalladas para repasar.
             </p>
-            <Link href="/history">
-              <Button variant="secondary" size="sm" className="w-full">Ver historial</Button>
-            </Link>
+            {isAuthenticated ? (
+              <Link href="/history">
+                <Button variant="secondary" size="sm" className="w-full">Ver historial</Button>
+              </Link>
+            ) : (
+              <p className="text-xs text-muted-foreground italic">Inicia sesión para ver tu historial</p>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -275,12 +370,21 @@ export default function AboutPage() {
           </div>
           
           <div className="mt-6 flex justify-center">
-            <Link href="/dashboard">
-              <Button className="flex items-center gap-2">
-                <BarChart2 size={18} />
-                Ir al Dashboard
-              </Button>
-            </Link>
+            {isAuthenticated ? (
+              <Link href="/dashboard">
+                <Button className="flex items-center gap-2">
+                  <BarChart2 size={18} />
+                  Ir al Dashboard
+                </Button>
+              </Link>
+            ) : (
+              <Link href="/login">
+                <Button className="flex items-center gap-2">
+                  <LogIn size={18} />
+                  Iniciar sesión
+                </Button>
+              </Link>
+            )}
           </div>
         </CardContent>
       </Card>
