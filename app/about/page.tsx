@@ -44,7 +44,7 @@ export default function AboutPage() {
                       Iniciar chat
                     </Button>
                   </Link>
-                  <Link href="/quiz">
+                  <Link href="/quizzes">
                     <Button variant="outline" className="flex items-center gap-2">
                       <FileText size={18} />
                       Generar cuestionario
@@ -285,7 +285,7 @@ export default function AboutPage() {
               Genera cuestionarios personalizados por tema para practicar y evaluar tu conocimiento. Recibe retroalimentación inmediata.
             </p>
             {isAuthenticated ? (
-              <Link href="/quiz">
+              <Link href="/quizzes">
                 <Button variant="secondary" size="sm" className="w-full">Crear cuestionario</Button>
               </Link>
             ) : (
@@ -306,7 +306,7 @@ export default function AboutPage() {
               Revisa tu historial de respuestas correctas y descarga un PDF con explicaciones detalladas para repasar.
             </p>
             {isAuthenticated ? (
-              <Link href="/history">
+              <Link href="/dashboard">
                 <Button variant="secondary" size="sm" className="w-full">Ver historial</Button>
               </Link>
             ) : (
